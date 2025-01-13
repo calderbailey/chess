@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -10,8 +11,10 @@ import java.util.Collection;
  */
 public class ChessPiece {
     private final PieceType type;
+    private final ChessGame.TeamColor pieceColor;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.type = type;
+        this.pieceColor = pieceColor;
     }
 
     /**
@@ -30,7 +33,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
@@ -49,12 +52,90 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == null) {
-            System.out.printf("No Piece at this Location");
+        PieceType type = piece.getPieceType();
+        if (type == null) {
+            System.out.print("No Piece at this Location");
+        }
+        else if (type == PieceType.KING){
+            System.out.print("This Piece is a King.");
+        }
+        else if (type == PieceType.QUEEN){
+            System.out.print("This Piece is a Queen.");
+        }
+        else if (type == PieceType.BISHOP){
+            System.out.print("This Piece is a Bishop.");
+        }
+        else if (type == PieceType.KNIGHT){
+            System.out.print("This Piece is a Knight.");
+        }
+        else if (type == PieceType.ROOK){
+            return RookMoves(board, myPosition);
+        }
+        else if (type == PieceType.PAWN){
+            System.out.print("This Piece is a Pawn.");
         }
         else {
-            System.out.printf("Not NULL");
+            System.out.print("This is an INVALID piece type.");
         }
         return null;
+    }
+
+    private Collection<ChessMove> RookMoves(ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> MoveList = new ArrayList<>();
+        int myRow = myPosition.getRow();
+        int myCol = myPosition.getColumn();
+        //INCREASING ROW SCREEN
+        int RowIndexInc = myRow+1;
+        while (RowIndexInc < 8) {
+            ChessPosition NewPosition = new ChessPosition(RowIndexInc, myCol);
+            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
+            if (NewPositionPiece == null) {
+                ChessMove NewMove = new ChessMove(myPosition, NewPosition, PieceType.ROOK);
+                MoveList.add(NewMove);
+                RowIndexInc++;
+            } else {
+                break;
+            }
+        }
+        //DECREASING ROW SCREEN
+        int RowIndexDec = myRow-1;
+        while (RowIndexDec >= 0) {
+            ChessPosition NewPosition = new ChessPosition(RowIndexDec, myCol);
+            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
+            if (NewPositionPiece == null) {
+                ChessMove NewMove = new ChessMove(myPosition, NewPosition, PieceType.ROOK);
+                MoveList.add(NewMove);
+                RowIndexDec--;
+            } else {
+                break;
+            }
+        }
+        //INCREASING COL SCREEN
+        int ColIndexInc = myCol+1;
+        while (ColIndexInc < 8) {
+            ChessPosition NewPosition = new ChessPosition(myRow, ColIndexInc);
+            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
+            if (NewPositionPiece == null) {
+                ChessMove NewMove = new ChessMove(myPosition, NewPosition, PieceType.ROOK);
+                MoveList.add(NewMove);
+                ColIndexInc++;
+            } else {
+                break;
+            }
+        }
+        //DECREASING COL SCREEN
+        int ColIndexDec = myCol+1;
+        while (ColIndexDec >= 0) {
+            ChessPosition NewPosition = new ChessPosition(myRow, ColIndexDec);
+            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
+            if (NewPositionPiece == null) {
+                ChessMove NewMove = new ChessMove(myPosition, NewPosition, PieceType.ROOK);
+                MoveList.add(NewMove);
+                ColIndexDec--;
+            } else {
+                break;
+            }
+        }
+        return MoveList;
     }
 }
