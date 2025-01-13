@@ -1,5 +1,7 @@
 package chess;
 
+import chess.PieceMoveCalculators.RookMoveCalculator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -54,7 +56,7 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
         PieceType type = piece.getPieceType();
         if (type == null) {
-            System.out.print("No Piece at this Location");
+            throw new NullPointerException("No Piece at this Location");
         }
         else if (type == PieceType.KING){
             System.out.print("This Piece is a King.");
@@ -69,93 +71,15 @@ public class ChessPiece {
             System.out.print("This Piece is a Knight.");
         }
         else if (type == PieceType.ROOK){
-            return RookMoves(board, myPosition);
+            return RookMoveCalculator.calculateRookMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.PAWN){
             System.out.print("This Piece is a Pawn.");
         }
         else {
-            System.out.print("This is an INVALID piece type.");
+            throw new IllegalArgumentException("INVALID piece type.");
         }
+        //////////REMOVE THIS WHEN FINISHED////////////////////
         return null;
-    }
-
-    private Collection<ChessMove> RookMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> MoveList = new ArrayList<>();
-        int myRow = myPosition.getRow();
-        int myCol = myPosition.getColumn();
-        //INCREASING ROW SCREEN
-        int RowIndexInc = myRow+1;
-        while (RowIndexInc <= 8) {
-            ChessPosition NewPosition = new ChessPosition(RowIndexInc, myCol);
-            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
-            if (NewPositionPiece == null) {
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                RowIndexInc++;
-            } else if (NewPositionPiece.getTeamColor() != pieceColor){
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                break;
-            }
-            else {
-                break;
-            }
-        }
-        //DECREASING ROW SCREEN
-        int RowIndexDec = myRow-1;
-        while (RowIndexDec >= 1) {
-            ChessPosition NewPosition = new ChessPosition(RowIndexDec, myCol);
-            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
-            if (NewPositionPiece == null) {
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                RowIndexDec--;
-            } else if (NewPositionPiece.getTeamColor() != pieceColor){
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                break;
-            }
-            else {
-                break;
-            }
-        }
-        //INCREASING COL SCREEN
-        int ColIndexInc = myCol+1;
-        while (ColIndexInc <= 8) {
-            ChessPosition NewPosition = new ChessPosition(myRow, ColIndexInc);
-            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
-            if (NewPositionPiece == null) {
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                ColIndexInc++;
-            } else if (NewPositionPiece.getTeamColor() != pieceColor){
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                break;
-            }
-            else {
-                break;
-            }
-        }
-        //DECREASING COL SCREEN
-        int ColIndexDec = myCol-1;
-        while (ColIndexDec >= 1) {
-            ChessPosition NewPosition = new ChessPosition(myRow, ColIndexDec);
-            ChessPiece NewPositionPiece = board.getPiece(NewPosition);
-            if (NewPositionPiece == null) {
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                ColIndexDec--;
-            } else if (NewPositionPiece.getTeamColor() != pieceColor){
-                ChessMove NewMove = new ChessMove(myPosition, NewPosition, null);
-                MoveList.add(NewMove);
-                break;
-            }
-            else {
-                break;
-            }
-        }
-        return MoveList;
     }
 }
