@@ -13,4 +13,4 @@ out/
 server/**/db.properties
 
 ### Test File ###
-shared/test/java/Test
+shared/test/java/Test.java
