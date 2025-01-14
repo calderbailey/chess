@@ -1,9 +1,6 @@
 package chess;
 
-import chess.PieceMoveCalculators.BishopMoveCalculator;
-import chess.PieceMoveCalculators.KingMoveCalculator;
-import chess.PieceMoveCalculators.QueenMoveCalculator;
-import chess.PieceMoveCalculators.RookMoveCalculator;
+import chess.PieceMoveCalculators.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,8 +75,7 @@ public class ChessPiece {
             return RookMoveCalculator.calculateRookMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.PAWN){
-            System.out.print("This Piece is a Pawn.");
-            return null;
+            return PawnMoveCalculator.calculatePawnMoves(pieceColor,board, myPosition, getPieceType());
         }
         else {
             throw new IllegalArgumentException("INVALID piece type.");
