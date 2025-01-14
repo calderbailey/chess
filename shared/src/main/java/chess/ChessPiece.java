@@ -1,6 +1,7 @@
 package chess;
 
 import chess.PieceMoveCalculators.BishopMoveCalculator;
+import chess.PieceMoveCalculators.KingMoveCalculator;
 import chess.PieceMoveCalculators.RookMoveCalculator;
 
 import java.util.ArrayList;
@@ -60,27 +61,28 @@ public class ChessPiece {
             throw new NullPointerException("No Piece at this Location");
         }
         else if (type == PieceType.KING){
-            System.out.print("This Piece is a King.");
+            return KingMoveCalculator.calculateKingMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.QUEEN){
             System.out.print("This Piece is a Queen.");
+            return null;
         }
         else if (type == PieceType.BISHOP){
             return BishopMoveCalculator.calculateBishopMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.KNIGHT){
             System.out.print("This Piece is a Knight.");
+            return null;
         }
         else if (type == PieceType.ROOK){
             return RookMoveCalculator.calculateRookMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.PAWN){
             System.out.print("This Piece is a Pawn.");
+            return null;
         }
         else {
             throw new IllegalArgumentException("INVALID piece type.");
         }
-        //////////REMOVE THIS WHEN FINISHED////////////////////
-        return null;
     }
 }

@@ -40,10 +40,8 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        boolean bool = startPosition.equals(chessMove.startPosition) &&
+        return startPosition.equals(chessMove.startPosition) &&
                 endPosition.equals(chessMove.endPosition);
-        System.out.printf("Start: " + promotionPiece + "   " + chessMove.promotionPiece + "\n");
-        return bool;
     }
 
     @Override
