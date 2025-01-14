@@ -2,6 +2,7 @@ package chess;
 
 import chess.PieceMoveCalculators.BishopMoveCalculator;
 import chess.PieceMoveCalculators.KingMoveCalculator;
+import chess.PieceMoveCalculators.QueenMoveCalculator;
 import chess.PieceMoveCalculators.RookMoveCalculator;
 
 import java.util.ArrayList;
@@ -64,8 +65,7 @@ public class ChessPiece {
             return KingMoveCalculator.calculateKingMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.QUEEN){
-            System.out.print("This Piece is a Queen.");
-            return null;
+            return QueenMoveCalculator.calculateQueenMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.BISHOP){
             return BishopMoveCalculator.calculateBishopMoves(pieceColor,board, myPosition);

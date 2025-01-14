@@ -17,8 +17,8 @@ public class KingMoveCalculator {
         int rowMax = myRow+1;
         int colMax = myCol+1;
         //SCREENING SURROUNDING SQUARES
-        while (rowIndex <= rowMax && rowIndex >= 1 && rowIndex <= 8){
-            while (colIndex <= colMax && colIndex>= 1 && rowIndex<= 8) {
+        while (rowIndex <= rowMax && rowIndex >= 1 && rowIndex <= 8) {
+            while (colIndex <= colMax && colIndex >= 1 && colIndex <= 8) {
                 ChessPosition NewPosition = new ChessPosition(rowIndex, colIndex);
                 ChessPiece NewPositionPiece = board.getPiece(NewPosition);
                 if (NewPositionPiece == null) {
