@@ -12,11 +12,9 @@ public class BishopMoveCalculator {
         ArrayList<ChessMove> MoveList = new ArrayList<>();
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
-        int rowIndex;
-        int colIndex;
+        int rowIndex = myRow+1;
+        int colIndex = myCol-1;
         //UPPER LEFT SCREEN
-        rowIndex = myRow+1;
-        colIndex = myCol-1;
         while (rowIndex <= 8 && colIndex >= 1) {
             ChessPosition NewPosition = new ChessPosition(rowIndex, colIndex);
             ChessPiece NewPositionPiece = board.getPiece(NewPosition);
