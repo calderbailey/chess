@@ -19,7 +19,7 @@ public class KnightMoveCalculator {
             while (colIndex >= myCol -1) {
                 MoveList.add(new ChessMove(myPosition,
                              new ChessPosition(rowIndex, colIndex),
-                             ChessPiece.PieceType.KNIGHT));
+                             null));
                 colIndex = colIndex -2;
             }
             colIndex = myCol +1;
@@ -33,7 +33,7 @@ public class KnightMoveCalculator {
             while (rowIndex >= myRow -1) {
                 MoveList.add(new ChessMove(myPosition,
                         new ChessPosition(rowIndex, colIndex),
-                        ChessPiece.PieceType.KNIGHT));
+                        null));
                 rowIndex = rowIndex -2;
             }
             rowIndex = myRow +1;
