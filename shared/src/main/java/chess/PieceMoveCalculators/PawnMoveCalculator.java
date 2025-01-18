@@ -7,27 +7,9 @@ import java.util.Collection;
 
 public class PawnMoveCalculator {
 
-    private static Collection<ChessMove> checkPawnPromotion(Collection<ChessMove> input) {
-        Collection<ChessMove> output = new ArrayList<>();
-        output.addAll(input);
-        for (ChessMove move : input) {
-            if (move.getEndPosition().getRow() == 8 || move.getEndPosition().getRow() == 1) {
-                output.remove(move);
-                for (ChessPiece.PieceType pt : ChessPiece.PieceType.values()) {
-                    if (!pt.equals(ChessPiece.PieceType.PAWN) && !pt.equals(ChessPiece.PieceType.KING)) {
-                        ChessMove NewMove = new ChessMove(move.getStartPosition(), move.getEndPosition(), pt);
-                        output.add(NewMove);
-                    }
-                }
-            }
-        }
-        return output;
-    }
-
     public static Collection<ChessMove> calculatePawnMoves(ChessGame.TeamColor pieceColor,
-                                                             ChessBoard board,
-                                                             ChessPosition myPosition,
-                                                             ChessPiece.PieceType promotionPiece) {
+                                                           ChessBoard board,
+                                                           ChessPosition myPosition) {
         ArrayList<ChessMove> MoveList = new ArrayList<>();
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
@@ -55,7 +37,7 @@ public class PawnMoveCalculator {
                     MoveList.add(NewMove);
                 }
             }
-            if (myCol -1 >= 1){
+            if (myCol - 1 >= 1) {
                 NewPosition = new ChessPosition(myRow + 1, myCol - 1);
                 NewPositionPiece = board.getPiece(NewPosition);
                 if (NewPositionPiece != null && NewPositionPiece.getTeamColor() != pieceColor) {
@@ -88,7 +70,7 @@ public class PawnMoveCalculator {
                     MoveList.add(NewMove);
                 }
             }
-            if (myCol -1 >= 1) {
+            if (myCol - 1 >= 1) {
                 NewPosition = new ChessPosition(myRow - 1, myCol - 1);
                 NewPositionPiece = board.getPiece(NewPosition);
                 if (NewPositionPiece != null && NewPositionPiece.getTeamColor() != pieceColor) {
@@ -97,6 +79,23 @@ public class PawnMoveCalculator {
                 }
             }
         }
-        return checkPawnPromotion(MoveList);
+        return checkForPromotion(MoveList);
+    }
+
+    private static Collection<ChessMove> checkForPromotion(Collection<ChessMove> input) {
+        Collection<ChessMove> output = new ArrayList<>();
+        output.addAll(input);
+        for (ChessMove move : input) {
+            if (move.getEndPosition().getRow() == 8 || move.getEndPosition().getRow() == 1) {
+                output.remove(move);
+                for (ChessPiece.PieceType pt : ChessPiece.PieceType.values()) {
+                    if (!pt.equals(ChessPiece.PieceType.PAWN) && !pt.equals(ChessPiece.PieceType.KING)) {
+                        ChessMove NewMove = new ChessMove(move.getStartPosition(), move.getEndPosition(), pt);
+                        output.add(NewMove);
+                    }
+                }
+            }
+        }
+        return output;
     }
 }

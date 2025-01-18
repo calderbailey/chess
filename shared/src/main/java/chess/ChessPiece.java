@@ -68,14 +68,13 @@ public class ChessPiece {
             return BishopMoveCalculator.calculateBishopMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.KNIGHT){
-            System.out.print("This Piece is a Knight.");
-            return null;
+            return KnightMoveCalculator.calculateKnightMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.ROOK){
             return RookMoveCalculator.calculateRookMoves(pieceColor,board, myPosition);
         }
         else if (type == PieceType.PAWN){
-            return PawnMoveCalculator.calculatePawnMoves(pieceColor,board, myPosition, getPieceType());
+            return PawnMoveCalculator.calculatePawnMoves(pieceColor,board, myPosition);
         }
         else {
             throw new IllegalArgumentException("INVALID piece type.");
