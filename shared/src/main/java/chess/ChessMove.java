@@ -40,8 +40,18 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        return startPosition.equals(chessMove.startPosition) &&
-                endPosition.equals(chessMove.endPosition);
+        if (startPosition.equals(chessMove.startPosition) &&
+                endPosition.equals(chessMove.endPosition)) {
+            if (promotionPiece == null) {
+                if (chessMove.promotionPiece == null) {
+                    return true;
+                }
+                return false;
+            }
+            return promotionPiece.equals(chessMove.promotionPiece);
+        }
+
+        return false;
     }
 
     @Override
