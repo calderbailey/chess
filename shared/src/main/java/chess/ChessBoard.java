@@ -129,5 +129,6 @@ public class ChessBoard {
             rowindex --;
         }
         System.out.print("\n");
+
     }
 }

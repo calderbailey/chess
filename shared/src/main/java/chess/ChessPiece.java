@@ -32,6 +32,20 @@ public class ChessPiece {
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ChessPiece)) {
+            return false;
+        }
+        ChessPiece cp = (ChessPiece) obj;
+        return (pieceColor == cp.getTeamColor() && type == cp.getPieceType());
+    }
+
+    @Override
     public String toString() {
         if (type == PieceType.KNIGHT) {
             if (pieceColor == ChessGame.TeamColor.WHITE) {
