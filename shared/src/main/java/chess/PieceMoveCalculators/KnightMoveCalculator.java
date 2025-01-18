@@ -21,12 +21,9 @@ public class KnightMoveCalculator {
                              new ChessPosition(rowIndex, colIndex),
                              ChessPiece.PieceType.KNIGHT));
                 colIndex = colIndex -2;
-                System.out.printf("colIndex: " + colIndex + "\n");
             }
             colIndex = myCol +1;
             rowIndex = rowIndex -4;
-            System.out.printf("rowIndex: " + rowIndex + "\n");
-
         }
 
         //LEFT and RIGHT Heavy Moves
@@ -38,11 +35,9 @@ public class KnightMoveCalculator {
                         new ChessPosition(rowIndex, colIndex),
                         ChessPiece.PieceType.KNIGHT));
                 rowIndex = rowIndex -2;
-                System.out.printf("rowIndex: " + rowIndex + "\n");
             }
             rowIndex = myRow +1;
             colIndex = colIndex -4;
-            System.out.printf("colIndex: " + colIndex + "\n");
         }
 
         //Final Return
