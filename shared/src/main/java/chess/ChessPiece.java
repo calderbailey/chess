@@ -31,6 +31,24 @@ public class ChessPiece {
         PAWN
     }
 
+    @Override
+    public String toString() {
+        if (type == PieceType.KNIGHT) {
+            if (pieceColor == ChessGame.TeamColor.WHITE) {
+                return "N";
+            }
+            else {
+                return "n";
+            }
+        }
+        else {
+            if (pieceColor == ChessGame.TeamColor.WHITE) {
+                return getPieceType().toString().substring(0, 1).toUpperCase();
+            }
+            return getPieceType().toString().substring(0, 1).toLowerCase();
+        }
+    }
+
     /**
      * @return Which team this chess piece belongs to
      */
