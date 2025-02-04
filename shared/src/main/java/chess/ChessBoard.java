@@ -11,6 +11,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
+
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[9][9];
     public ChessBoard() {
