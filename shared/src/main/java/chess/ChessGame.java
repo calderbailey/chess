@@ -43,6 +43,14 @@ public class ChessGame implements Cloneable{
         else {setTeamTurn(TeamColor.BLACK);}
     }
 
+    private TeamColor invertTeamColor(TeamColor teamColor) {
+        if (teamColor == TeamColor.BLACK) {
+            return TeamColor.WHITE;
+        } else {
+            return TeamColor.BLACK;
+        }
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -101,32 +109,44 @@ public class ChessGame implements Cloneable{
         updateTeamTurn();
     }
 
-    /**
-     * Determines if the given team is in check
-     *
-     * @param teamColor which team to check for check
-     * @return True if the specified team is in check
-     */
-    public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition kingPosition = null;
-        Collection<ChessMove> enemyMoves = new ArrayList<>();
+    private Collection<ChessMove> getTeamMoves(TeamColor teamColor) {
+        Collection<ChessMove> teamMoves = new ArrayList<>();
         for (ChessPosition position : allPositions) {
             ChessPiece piece =  gameBoard.getPiece(position);
             if (piece != null) {
                 if (piece.getTeamColor() == teamColor) {
-                    if (piece.getPieceType() == ChessPiece.PieceType.KING)
-                        kingPosition = position;
-                } else {
-                    enemyMoves.addAll(piece.pieceMoves(gameBoard, position));
+                    teamMoves.addAll(piece.pieceMoves(gameBoard, position));
                 }
             }
         }
-        for (ChessMove move : enemyMoves) {
-            if (move.getEndPosition().equals(kingPosition)) {
-                return true;
+        return teamMoves;
+    }
+
+    private ChessPosition getKingPosition(TeamColor teamColor) {
+        ChessPosition kingPosition = null;
+        for (ChessPosition position : allPositions) {
+            ChessPiece piece = gameBoard.getPiece(position);
+            if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                kingPosition = position;
             }
         }
-        return false;
+        return kingPosition;
+    }
+        /**
+         * Determines if the given team is in check
+         *
+         * @param teamColor which team to check for check
+         * @return True if the specified team is in check
+         */
+    public boolean isInCheck(TeamColor teamColor) {
+    ChessPosition kingPosition = getKingPosition(teamColor);
+    Collection<ChessMove> enemyMoves = getTeamMoves(invertTeamColor(teamColor));
+    for (ChessMove move : enemyMoves) {
+        if (move.getEndPosition().equals(kingPosition)) {
+            return true;
+        }
+    }
+    return false;
     }
 
     /**
@@ -136,7 +156,7 @@ public class ChessGame implements Cloneable{
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor) && !isEscapePossible(teamColor);
     }
 
     /**
@@ -147,7 +167,22 @@ public class ChessGame implements Cloneable{
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return !isInCheck(teamColor) && !isEscapePossible(teamColor);
+    }
+
+    public boolean isEscapePossible(TeamColor teamColor) {
+        Collection<ChessMove> possibleMoves = getTeamMoves(teamColor);
+        for (ChessMove move : possibleMoves) {
+            ChessGame gameClone = clone();
+            gameClone.setTeamTurn(teamColor);
+            ChessPiece piece = gameClone.getBoard().getPiece(move.getStartPosition());
+            gameClone.getBoard().addPiece(move.getEndPosition(), piece);
+            gameClone.getBoard().addPiece(move.getStartPosition(), null);
+            if (!gameClone.isInCheck(teamColor)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -156,7 +191,7 @@ public class ChessGame implements Cloneable{
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        gameBoard = board;
+    gameBoard = board;
     }
 
     /**
@@ -165,7 +200,7 @@ public class ChessGame implements Cloneable{
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        return gameBoard;
+    return gameBoard;
     }
 
     @Override
@@ -181,3 +216,4 @@ public class ChessGame implements Cloneable{
         }
     }
 }
+
