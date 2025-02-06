@@ -12,7 +12,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 
-public class ChessBoard {
+public class ChessBoard implements Cloneable{
     private ChessPiece[][] squares = new ChessPiece[9][9];
     public ChessBoard() {
     }
@@ -29,6 +29,14 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(squares);
+    }
+
+    private ChessPiece[][] getArray() {
+        return this.squares;
+    }
+
+    private void setArray(ChessPiece[][] newArray) {
+        this.squares = newArray;
     }
 
     /**
@@ -131,5 +139,27 @@ public class ChessBoard {
         }
         System.out.print("\n");
 
+    }
+
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            ChessPiece[][] newBoard = new ChessPiece[9][9];
+            for (int rowIndex = 1; rowIndex <= 8; rowIndex ++) {
+                for (int colIndex = 1; colIndex <= 8; colIndex ++) {
+                    ChessPiece clonedPiece = clone.getArray()[rowIndex][colIndex];
+                    if (clonedPiece == null) {
+                        newBoard[rowIndex][colIndex] = null;
+                    } else {
+                        newBoard[rowIndex][colIndex] = clonedPiece.clone();
+                    }
+                }
+            }
+            clone.setArray(newBoard);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

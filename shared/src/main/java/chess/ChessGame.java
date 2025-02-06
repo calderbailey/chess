@@ -9,7 +9,7 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
+public class ChessGame implements Cloneable{
     private ChessBoard gameBoard = new ChessBoard();
     private TeamColor teamTurn = TeamColor.WHITE;
     private final Collection<ChessPosition> allPositions = new ArrayList<>();
@@ -54,7 +54,9 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = getBoard().getPiece(startPosition);
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(getBoard(), startPosition);
+        return possibleMoves;
     }
 
     /**
@@ -132,5 +134,17 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return gameBoard;
+    }
+
+    @Override
+    public ChessGame clone() {
+        try {
+            ChessGame clone = (ChessGame) super.clone();
+            clone.setBoard(clone.getBoard().clone());
+            TeamColor cloneTurn = clone.getTeamTurn();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
