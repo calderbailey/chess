@@ -12,12 +12,23 @@ public class ChessMove {
     private final ChessPosition  startPosition;
     private final ChessPosition  endPosition;
     private final ChessPiece.PieceType promotionPiece;
+    private final boolean movedTwo;
+
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
+                     ChessPiece.PieceType promotionPiece,
+                     boolean movedTwo) {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.promotionPiece = promotionPiece;
+        this.movedTwo = movedTwo;
+    }
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
+        movedTwo = false;
     }
 
     /**
@@ -34,6 +45,8 @@ public class ChessMove {
         return endPosition;
     }
 
+    public boolean getMovedTwo() {return movedTwo;}
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -41,7 +54,8 @@ public class ChessMove {
         }
         ChessMove chessMove = (ChessMove) o;
         if (startPosition.equals(chessMove.startPosition) &&
-                endPosition.equals(chessMove.endPosition)) {
+                endPosition.equals(chessMove.endPosition) &&
+                movedTwo == chessMove.getMovedTwo()) {
             if (promotionPiece == null) {
                 if (chessMove.promotionPiece == null) {
                     return true;
@@ -73,6 +87,7 @@ public class ChessMove {
         return "ChessMove{" +
                 "startPosition=" + startPosition +
                 ", endPosition=" + endPosition +
+                ", movedTwo=" + movedTwo +
                 ", promotionPiece=" + promotionPiece +
                 '}';
     }
