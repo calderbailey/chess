@@ -12,9 +12,12 @@ import java.util.Collection;
 public class ChessPiece implements Cloneable{
     private final PieceType type;
     private final ChessGame.TeamColor pieceColor;
+    private boolean movedTwo;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.type = type;
         this.pieceColor = pieceColor;
+        this.movedTwo = false;
     }
 
 
@@ -41,7 +44,7 @@ public class ChessPiece implements Cloneable{
             return false;
         }
         ChessPiece cp = (ChessPiece) obj;
-        return (pieceColor == cp.getTeamColor() && type == cp.getPieceType());
+        return (pieceColor == cp.getTeamColor() && type == cp.getPieceType() && movedTwo == cp.getMovedTwo());
     }
 
     @Override
@@ -60,6 +63,12 @@ public class ChessPiece implements Cloneable{
             }
             return getPieceType().toString().substring(0, 1).toLowerCase();
         }
+    }
+
+    public boolean getMovedTwo() {return movedTwo;}
+
+    public void setMovedTwo(boolean updatedMovedTwo) {
+        movedTwo = updatedMovedTwo;
     }
 
     /**
@@ -403,6 +412,7 @@ public class ChessPiece implements Cloneable{
             ChessPiece clone = (ChessPiece) super.clone();
             PieceType cloneType = clone.getPieceType();
             ChessGame.TeamColor cloneColor = clone.getTeamColor();
+            boolean cloneMovedTwo = clone.getMovedTwo();
             clone = new ChessPiece(cloneColor, cloneType);
             return clone;
         } catch (CloneNotSupportedException e) {
