@@ -11,11 +11,18 @@ import dataaccess.UserDAOInterface.*;
 public class UserService {
     private static final UserDAOInterface userDAO = new MemoryUserDAO();
 
-    //    public RegisterResult register(RegisterRequest registerRequest) {}
+    public RegisterResult register(RegisterRequest registerRequest) {
+        String username = registerRequest.username();
+        String password = registerRequest.password();
+        String email = registerRequest.email();
+        userDAO.createUser(new UserData(username, password, email));
+        RegisterResult regRes = new RegisterResult(username, "null");
+        return regRes;
+    }
+
     public LoginResult login(LoginRequest loginRequest) {
         String username = loginRequest.username();
         String password = loginRequest.password();
-        userDAO.createUser(new UserData(username, password, "null"));
         UserData usernameResult = userDAO.getUser(username);
         return new LoginResult(usernameResult.username(), "null");
     }
