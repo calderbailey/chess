@@ -1,19 +1,10 @@
 package server;
 
-import dataaccess.MemoryUserDAO;
+import com.google.gson.Gson;
+import exceptionhandling.*;
 import handlers.LoginHandler;
 import handlers.RegisterHandler;
-import model.UserData;
-import org.eclipse.jetty.util.log.Log;
-import requestresult.LoginRequest;
-import requestresult.RegisterResult;
 import spark.*;
-
-import com.google.gson.Gson;
-
-import javax.xml.namespace.QName;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Server {
 
@@ -29,9 +20,10 @@ public class Server {
         });
 
         Spark.post("/register", (req, res) -> {
-            return new RegisterHandler().handleRequest(req, res);
+            return new RegisterHandler().handleRequest(req);
         });
 
+        Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -40,5 +32,10 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private void exceptionHandler(DataAccessException ex, Request req, Response res) {
+        res.status(ex.getStatusCode());
+        res.body(ex.toJson());
     }
 }

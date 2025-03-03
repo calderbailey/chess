@@ -1,20 +1,24 @@
 package service;
 
-import InMemoryDatabases.UserDatabase;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAOInterface;
+import exceptionhandling.DataAccessException;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import requestresult.*;
-import dataaccess.UserDAOInterface.*;
 
 public class UserService {
     private static final UserDAOInterface userDAO = new MemoryUserDAO();
 
-    public RegisterResult register(RegisterRequest registerRequest) {
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
         String email = registerRequest.email();
+        if (username == null | password == null | email == null) {
+            throw new DataAccessException("Error: bad request", 400);
+        }
+        if (userDAO.getUser(username) != null) {
+            throw new DataAccessException("Error: already taken", 403);
+        }
         userDAO.createUser(new UserData(username, password, email));
         RegisterResult regRes = new RegisterResult(username, "null");
         return regRes;
@@ -27,4 +31,5 @@ public class UserService {
         return new LoginResult(usernameResult.username(), "null");
     }
 //    public void logout(LogoutRequest logoutRequest) {}
+
 }

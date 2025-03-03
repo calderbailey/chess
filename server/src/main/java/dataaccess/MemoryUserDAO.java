@@ -19,6 +19,5 @@ public class MemoryUserDAO implements UserDAOInterface {
 
     @Override
     public void clear() {
-
     }
 }
