@@ -1,14 +1,17 @@
 package service;
 
+import dataaccess.AuthDAOInterface;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAOInterface;
 import exceptionhandling.DataAccessException;
+import model.AuthData;
 import model.UserData;
 import requestresult.*;
 
 public class UserService {
-    private static final UserDAOInterface userDAO = new MemoryUserDAO();
-
+    private final UserDAOInterface userDAO = new MemoryUserDAO();
+    private final AuthDAOInterface authDAO = new MemoryAuthDAO();
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
@@ -20,7 +23,9 @@ public class UserService {
             throw new DataAccessException("Error: already taken", 403);
         }
         userDAO.createUser(new UserData(username, password, email));
-        RegisterResult regRes = new RegisterResult(username, "null");
+        AuthData authData = authDAO.createAuth(username);
+        String authToken = authData.authToken();
+        RegisterResult regRes = new RegisterResult(username, authToken);
         return regRes;
     }
 

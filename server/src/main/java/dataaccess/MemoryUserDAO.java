@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAOInterface {
-    private Map<String, UserData> userMap = new HashMap<>();
+    private static final Map<String, UserData> userMap = new HashMap<>();
 
     @Override
     public void createUser(UserData userData) {
@@ -19,5 +19,6 @@ public class MemoryUserDAO implements UserDAOInterface {
 
     @Override
     public void clear() {
+        userMap.clear();
     }
 }
