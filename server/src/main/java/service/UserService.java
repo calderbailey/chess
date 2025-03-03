@@ -9,6 +9,8 @@ import model.AuthData;
 import model.UserData;
 import requestresult.*;
 
+import javax.xml.crypto.Data;
+
 public class UserService {
     private final UserDAOInterface userDAO = new MemoryUserDAO();
     private final AuthDAOInterface authDAO = new MemoryAuthDAO();
@@ -43,6 +45,10 @@ public class UserService {
         String authToken = authData.authToken();
         return new LoginResult(usernameResult.username(), authToken);
     }
-//    public void logout(LogoutRequest logoutRequest) {}
+    public LogoutResult logout(LogoutRequest logoutRequest) {
+        String authToken = logoutRequest.authToken();
+        authDAO.delAuth(authToken);
+        return new LogoutResult();
+    }
 
 }

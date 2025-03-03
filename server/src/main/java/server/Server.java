@@ -21,6 +21,10 @@ public class Server {
             return new LoginHandler().handleRequest(req);
         });
 
+        Spark.delete("/session", (req, res) -> {
+            return new LogoutHandler().handleRequest(req);
+        });
+
         Spark.post("/user", (req, res) -> {
             return new RegisterHandler().handleRequest(req);
         });

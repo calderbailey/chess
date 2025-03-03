@@ -21,6 +21,11 @@ public class MemoryAuthDAO implements AuthDAOInterface {
     }
 
     @Override
+    public void delAuth(String authToken) {
+        authMap.remove(authToken);
+    }
+
+    @Override
     public void clear() {
         authMap.clear();
     }
