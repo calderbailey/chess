@@ -17,11 +17,11 @@ public class Server {
             return new DeleteHandler().handleRequest();
         });
 
-        Spark.post("/login", (req, res) -> {
+        Spark.post("/session", (req, res) -> {
             return new LoginHandler().handleRequest(req);
         });
 
-        Spark.post("/register", (req, res) -> {
+        Spark.post("/user", (req, res) -> {
             return new RegisterHandler().handleRequest(req);
         });
 
