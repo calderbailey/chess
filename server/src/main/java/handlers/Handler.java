@@ -17,7 +17,7 @@ public abstract class Handler {
         try {
             return gson.fromJson(json.body(), request);
         } catch (Exception e) {
-            throw new DataAccessException("Error: unauthorized", 401);
+            throw new DataAccessException("Error: bad request", 400);
         }
     }
 

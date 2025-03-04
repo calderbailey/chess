@@ -5,7 +5,6 @@ import requestresult.LoginRequest;
 import requestresult.LoginResult;
 import service.UserService;
 import spark.Request;
-import spark.Response;
 
 public class LoginHandler  extends Handler{
     public String handleRequest (Request  jsonRequest) throws DataAccessException {
