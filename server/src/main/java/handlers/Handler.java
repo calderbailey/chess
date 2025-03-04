@@ -1,13 +1,17 @@
 package handlers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dataaccess.AuthDAOInterface;
 import dataaccess.MemoryAuthDAO;
 import exceptionhandling.DataAccessException;
+import model.GameData;
 import spark.Request;
 
 public abstract class Handler {
-    protected final Gson gson = new Gson();
+    protected final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(GameData.class, new CustomGameDataSerializer())
+            .create();
 
     protected String toJson(Object object) {
         return gson.toJson(object);

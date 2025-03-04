@@ -33,6 +33,10 @@ public class Server {
             return new CreateGameHandler().handleRequest(req);
         });
 
+        Spark.get("/game", (req, res) -> {
+            return new ListGamesHandler().handleRequest(req);
+        });
+
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();

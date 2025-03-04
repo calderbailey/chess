@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,5 +37,15 @@ public class MemoryGameDAO implements GameDAOInterface{
     public Integer createGameID(){
         nextGameID ++;
         return nextGameID - 1;
+    }
+
+    @Override
+    public ArrayList<GameData> getGameList() {
+        ArrayList<GameData> gameList = new ArrayList<>();
+        for (Integer gameID : gameMap.keySet()) {
+            GameData game = gameMap.get(gameID);
+            gameList.add(game);
+        }
+        return gameList;
     }
 }

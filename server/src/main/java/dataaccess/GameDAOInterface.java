@@ -1,10 +1,7 @@
 package dataaccess;
 
-import model.AuthData;
 import model.GameData;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 public interface GameDAOInterface {
     Integer createGame(String gameName);
@@ -12,4 +9,5 @@ public interface GameDAOInterface {
     void delGame(Integer gameID);
     void clear();
     Integer createGameID();
+    ArrayList<GameData> getGameList();
 }
