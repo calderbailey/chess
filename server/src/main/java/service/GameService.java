@@ -5,7 +5,7 @@ import exceptionhandling.DataAccessException;
 import requestresult.*;
 
 public class GameService {
-    private final GameDAOInterface GAME_DAO = new MemoryGameDAO();
+    private final static GameDAOInterface GAME_DAO = new MemoryGameDAO();
 
     public CreateResult createGame(CreateRequest createRequest) throws DataAccessException {
         String newGameName = createRequest.gameName();
