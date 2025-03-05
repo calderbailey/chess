@@ -141,12 +141,12 @@ public class ChessPiece implements Cloneable{
     private Collection<ChessMove> calculateQueenMoves(ChessGame.TeamColor pieceColor,
                                                             ChessBoard board,
                                                             ChessPosition myPosition) {
-        Collection<ChessMove> BishopMoves = calculateBishopMoves(pieceColor, board, myPosition);
-        Collection<ChessMove> RookMoves = calculateRookMoves(pieceColor, board, myPosition);
-        Collection<ChessMove> QueenMoves = new ArrayList<>();
-        QueenMoves.addAll(BishopMoves);
-        QueenMoves.addAll(RookMoves);
-        return QueenMoves;
+        Collection<ChessMove> bishopMoves = calculateBishopMoves(pieceColor, board, myPosition);
+        Collection<ChessMove> rookMoves = calculateRookMoves(pieceColor, board, myPosition);
+        Collection<ChessMove> queenMoves = new ArrayList<>();
+        queenMoves.addAll(bishopMoves);
+        queenMoves.addAll(rookMoves);
+        return queenMoves;
     }
 
     private Collection<ChessMove> calculateBishopMoves(ChessGame.TeamColor pieceColor,
@@ -391,8 +391,8 @@ public class ChessPiece implements Cloneable{
                 output.remove(move);
                 for (ChessPiece.PieceType pt : ChessPiece.PieceType.values()) {
                     if (!pt.equals(ChessPiece.PieceType.PAWN) && !pt.equals(ChessPiece.PieceType.KING)) {
-                        ChessMove NewMove = new ChessMove(move.getStartPosition(), move.getEndPosition(), pt);
-                        output.add(NewMove);
+                        ChessMove newMove = new ChessMove(move.getStartPosition(), move.getEndPosition(), pt);
+                        output.add(newMove);
                     }
                 }
             }

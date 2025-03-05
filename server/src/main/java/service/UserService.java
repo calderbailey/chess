@@ -9,8 +9,8 @@ import requestresult.*;
 import javax.xml.crypto.Data;
 
 public class UserService {
-    private final UserDAOInterface userDAO = new MemoryUserDAO();
-    private final AuthDAOInterface authDAO = new MemoryAuthDAO();
+    private final UserDAOInterface USER_DAO = new MemoryUserDAO();
+    private final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
@@ -18,11 +18,11 @@ public class UserService {
         if (username == null | password == null | email == null) {
             throw new DataAccessException("Error: bad request", 400);
         }
-        if (userDAO.getUser(username) != null) {
+        if (USER_DAO.getUser(username) != null) {
             throw new DataAccessException("Error: already taken", 403);
         }
-        userDAO.createUser(new UserData(username, password, email));
-        AuthData authData = authDAO.createAuth(username);
+        USER_DAO.createUser(new UserData(username, password, email));
+        AuthData authData = AUTH_DAO.createAuth(username);
         String authToken = authData.authToken();
         RegisterResult regRes = new RegisterResult(username, authToken);
         return regRes;
@@ -34,18 +34,18 @@ public class UserService {
         if (username == null | password == null) {
             throw new DataAccessException("Error: bad request", 400);
         }
-        UserData usernameResult = userDAO.getUser(username);
+        UserData usernameResult = USER_DAO.getUser(username);
         if (usernameResult == null || !usernameResult.password().equals(password)) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
-        AuthData authData = authDAO.createAuth(username);
+        AuthData authData = AUTH_DAO.createAuth(username);
         String authToken = authData.authToken();
         return new LoginResult(usernameResult.username(), authToken);
     }
 
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException{
         String authToken = logoutRequest.authToken();
-        authDAO.delAuth(authToken);
+        AUTH_DAO.delAuth(authToken);
         return new LogoutResult();
     }
 

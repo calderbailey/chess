@@ -9,34 +9,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryGameDAO implements GameDAOInterface{
-    private static final Map<Integer, GameData> gameMap = new HashMap<>();
+    private static final Map<Integer, GameData> GAME_MAP = new HashMap<>();
     private static Integer nextGameID = 1;
 
     @Override
     public Integer createGame(String gameName) throws DataAccessException {
         GameData newGame = new GameData(createGameID(),null, null, gameName, new ChessGame());
-        for (Integer gameID : gameMap.keySet()) {
-            if (gameMap.get(gameID).gameName() == gameName) {
+        for (Integer gameID : GAME_MAP.keySet()) {
+            if (GAME_MAP.get(gameID).gameName() == gameName) {
                 throw new DataAccessException("Error: game name taken", 500);
             }
         }
-        gameMap.put(newGame.gameID(), newGame);
+        GAME_MAP.put(newGame.gameID(), newGame);
         return newGame.gameID();
     }
 
     @Override
     public GameData getGame(Integer gameID) {
-        return gameMap.get(gameID);
-    }
-
-    @Override
-    public void delGame(Integer gameID) {
-        gameMap.remove(gameID);
+        return GAME_MAP.get(gameID);
     }
 
     @Override
     public void clear() {
-        gameMap.clear();
+        GAME_MAP.clear();
         nextGameID = 1;
     }
 
@@ -49,8 +44,8 @@ public class MemoryGameDAO implements GameDAOInterface{
     @Override
     public ArrayList<GameData> getGameList() {
         ArrayList<GameData> gameList = new ArrayList<>();
-        for (Integer gameID : gameMap.keySet()) {
-            GameData game = gameMap.get(gameID);
+        for (Integer gameID : GAME_MAP.keySet()) {
+            GameData game = GAME_MAP.get(gameID);
             gameList.add(game);
         }
         return gameList;
@@ -58,7 +53,7 @@ public class MemoryGameDAO implements GameDAOInterface{
 
     @Override
     public void colorAvailable(String color, Integer gameID) throws DataAccessException{
-        GameData game = gameMap.get(gameID);
+        GameData game = GAME_MAP.get(gameID);
         if (color == null | gameID == null) {
             throw new DataAccessException("Error: bad request", 400);
         } else if (!(color.equals("WHITE") | color.equals("BLACK"))) {
@@ -72,15 +67,15 @@ public class MemoryGameDAO implements GameDAOInterface{
     @Override
     public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException{
         colorAvailable(playerColor, gameID);
-        GameData game = gameMap.get(gameID);
+        GameData game = GAME_MAP.get(gameID);
         GameData updatedGame;
         if (playerColor.equals("WHITE")) {
             updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
         } else {
             updatedGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
         }
-        gameMap.remove(gameID);
-        gameMap.put(gameID, updatedGame);
+        GAME_MAP.remove(gameID);
+        GAME_MAP.put(gameID, updatedGame);
     }
 
 }

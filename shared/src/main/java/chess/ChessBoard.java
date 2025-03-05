@@ -116,31 +116,6 @@ public class ChessBoard implements Cloneable{
         }
     }
 
-    public void printBoard() {
-        int rowindex = 8;
-        int colindex = 1;
-        System.out.print("\n");
-        while (rowindex >= 1) {
-            System.out.print("| ");
-            while (colindex <= 8) {
-                ChessPosition position = new ChessPosition(rowindex, colindex);
-                ChessPiece piece = this.getPiece(position);
-                if (piece == null) {
-                    System.out.print("  | ");
-                }
-                else {
-                    System.out.printf(piece.toString() + " | ");
-                }
-                colindex++;
-            }
-            System.out.print("\n");
-            colindex = 1;
-            rowindex --;
-        }
-        System.out.print("\n");
-
-    }
-
     @Override
     public ChessBoard clone() {
         try {

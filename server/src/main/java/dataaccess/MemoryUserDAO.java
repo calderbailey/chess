@@ -5,20 +5,20 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAOInterface {
-    private static final Map<String, UserData> userMap = new HashMap<>();
+    private static final Map<String, UserData> USER_MAP = new HashMap<>();
 
     @Override
     public void createUser(UserData userData) {
-        userMap.put(userData.username(), userData);
+        USER_MAP.put(userData.username(), userData);
     }
 
     @Override
     public UserData getUser(String username) {
-        return userMap.get(username);
+        return USER_MAP.get(username);
     }
 
     @Override
     public void clear() {
-        userMap.clear();
+        USER_MAP.clear();
     }
 }

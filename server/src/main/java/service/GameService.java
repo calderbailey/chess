@@ -5,18 +5,17 @@ import exceptionhandling.DataAccessException;
 import requestresult.*;
 
 public class GameService {
-    private final GameDAOInterface gameDAO = new MemoryGameDAO();
-    private final AuthDAOInterface authDAO = new MemoryAuthDAO();
+    private final GameDAOInterface GAME_DAO = new MemoryGameDAO();
 
     public CreateResult createGame(CreateRequest createRequest) throws DataAccessException {
         String newGameName = createRequest.gameName();
-        Integer newGameID = gameDAO.createGame(newGameName);
+        Integer newGameID = GAME_DAO.createGame(newGameName);
         CreateResult createResult = new CreateResult(newGameID);
         return createResult;
     }
 
     public ListGamesResult listGames(ListGamesRequest listRequest) {
-        ListGamesResult listRes = new ListGamesResult(gameDAO.getGameList());
+        ListGamesResult listRes = new ListGamesResult(GAME_DAO.getGameList());
         return listRes;
     }
 
@@ -24,7 +23,7 @@ public class GameService {
         String username = joinRequest.username();
         String playerColor = joinRequest.playerColor();
         Integer gameID = joinRequest.gameID();
-        gameDAO.updateGame(username, playerColor, gameID);
+        GAME_DAO.updateGame(username, playerColor, gameID);
         JoinGameResult joinRes = new JoinGameResult();
         return joinRes;
     }
