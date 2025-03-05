@@ -7,12 +7,12 @@ import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAOInterface;
 import exceptionhandling.DataAccessException;
 import handlers.Handler;
+import handlers.LoginHandler;
+import handlers.LogoutHandler;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import requestresult.LoginRequest;
-import requestresult.LoginResult;
-import requestresult.RegisterRequest;
+import requestresult.*;
 import service.UserService;
 
 
@@ -64,6 +64,29 @@ public class service {
         LoginRequest logReq = new LoginRequest("Username", "Password");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new UserService().login(logReq);
+        });
+        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("Logout: Success")
+    public void logoutSuccess() throws Exception{
+        userDAO.createUser(new UserData("Username", "Password", "email"));
+        LoginRequest logReq = new LoginRequest("Username", "Password");
+        LoginResult logRes = new UserService().login(logReq);
+        LogoutResult logoutRes = new UserService().logout(new LogoutRequest(logRes.authToken()));
+        Assertions.assertEquals(new LogoutResult(), logoutRes);
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("Logout: Unauthorized")
+    public void logoutUnauthorized() {
+        LogoutRequest logReq = new LogoutRequest("wrong");
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            new UserService().logout(logReq);
         });
         Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
         Assertions.assertEquals(401, exception.getStatusCode());

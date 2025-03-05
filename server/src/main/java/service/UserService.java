@@ -45,7 +45,7 @@ public class UserService {
         String authToken = authData.authToken();
         return new LoginResult(usernameResult.username(), authToken);
     }
-    public LogoutResult logout(LogoutRequest logoutRequest) {
+    public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException{
         String authToken = logoutRequest.authToken();
         authDAO.delAuth(authToken);
         return new LogoutResult();

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exceptionhandling.DataAccessException;
 import model.AuthData;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +22,12 @@ public class MemoryAuthDAO implements AuthDAOInterface {
     }
 
     @Override
-    public void delAuth(String authToken) {
-        authMap.remove(authToken);
+    public void delAuth(String authToken) throws DataAccessException {
+        if (authMap.get(authToken) != null) {
+            authMap.remove(authToken);
+        } else {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
     }
 
     @Override

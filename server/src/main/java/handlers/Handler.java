@@ -26,7 +26,7 @@ public abstract class Handler {
         }
     }
 
-    protected void checkAuth(String authToken) throws DataAccessException {
+    public void checkAuth(String authToken) throws DataAccessException {
         AuthDAOInterface authDAO = new MemoryAuthDAO();
         if (authDAO.getAuth(authToken) == null) {
             throw new DataAccessException("Error: unauthorized", 401);
