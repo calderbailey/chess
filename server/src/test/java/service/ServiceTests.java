@@ -1,3 +1,5 @@
+package service;
+
 import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import handlers.CreateGameHandler;
@@ -6,12 +8,10 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import requestresult.*;
-import service.UserService;
-import service.GameService;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class service {
+public class ServiceTests {
     private static final UserDAOInterface USER_DAO = new MemoryUserDAO();
     private static final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
     private static final GameDAOInterface GAME_DAO = new MemoryGameDAO();
