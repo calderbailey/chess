@@ -26,12 +26,12 @@ public class MemoryGameDAO implements GameDAOInterface{
 
     @Override
     public GameData getGame(Integer gameID) {
-        return null;
+        return gameMap.get(gameID);
     }
 
     @Override
     public void delGame(Integer gameID) {
-
+        gameMap.remove(gameID);
     }
 
     @Override

@@ -8,6 +8,7 @@ import handlers.Handler;
 import handlers.LoginHandler;
 import handlers.LogoutHandler;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import requestresult.*;
@@ -133,6 +134,31 @@ public class service {
         });
         Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
         Assertions.assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("JoinGame: Success")
+    public void joinGameSuccess() throws Exception{
+        gameDAO.createGame("Game 1");
+        JoinGameRequest joinReq = new JoinGameRequest("WHITE", 1, "USER");
+        new GameService().joinGame(joinReq);
+        GameData gameData = gameDAO.getGame(1);
+        Assertions.assertEquals("USER", gameData.whiteUsername());
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("JoinGame: Already Taken")
+    public void joinGameAlreadyTaken() throws Exception{
+        gameDAO.createGame("Game 1");
+        gameDAO.updateGame("USER1", "WHITE", 1);
+        JoinGameRequest joinReq = new JoinGameRequest("WHITE", 1, "USER2");
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            new GameService().joinGame(joinReq);
+        });
+        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
+        Assertions.assertEquals(403, exception.getStatusCode());
     }
 }
 
