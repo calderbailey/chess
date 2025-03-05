@@ -14,15 +14,15 @@ import service.GameService;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class Service {
-    private static final UserDAOInterface userDAO = new MemoryUserDAO();
-    private static final AuthDAOInterface authDAO = new MemoryAuthDAO();
-    private static final GameDAOInterface gameDAO = new MemoryGameDAO();
+    private static final UserDAOInterface USER_DAO = new MemoryUserDAO();
+    private static final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
+    private static final GameDAOInterface GAME_DAO = new MemoryGameDAO();
 
     @BeforeEach
     public void setup() {
-        userDAO.clear();
-        authDAO.clear();
-        gameDAO.clear();
+        USER_DAO.clear();
+        AUTH_DAO.clear();
+        GAME_DAO.clear();
     }
 
     @Test
@@ -31,7 +31,7 @@ public class Service {
     public void registerSuccess() throws DataAccessException{
         RegisterRequest regReq = new RegisterRequest("Username", "Password", "EMAIL@GMAIL.COM");
         new UserService().register(regReq);
-        UserData userData = userDAO.getUser("Username");
+        UserData userData = USER_DAO.getUser("Username");
         Assertions.assertEquals(new UserData("Username", "Password", "EMAIL@GMAIL.COM"), userData,
                 "Registration was not correctly added to the database");
     }
@@ -40,7 +40,7 @@ public class Service {
     @Order(2)
     @DisplayName("Register: User Taken")
     public void registerUserTaken() {
-        userDAO.createUser(new UserData("Username", "Password", "EMAIL@GMAIL.COM"));
+        USER_DAO.createUser(new UserData("Username", "Password", "EMAIL@GMAIL.COM"));
         RegisterRequest regReq = new RegisterRequest("Username", "Password", "EMAIL@GMAIL.COM");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new UserService().register(regReq);
@@ -53,11 +53,11 @@ public class Service {
     @Order(3)
     @DisplayName("Login: Success")
     public void loginSuccess() throws Exception{
-        userDAO.createUser(new UserData("Username", "Password", "email"));
+        USER_DAO.createUser(new UserData("Username", "Password", "email"));
         LoginRequest logReq = new LoginRequest("Username", "Password");
         LoginResult logRes = new UserService().login(logReq);
         String authToken = logRes.authToken();
-        AuthData authData = authDAO.getAuth(authToken);
+        AuthData authData = AUTH_DAO.getAuth(authToken);
         Assertions.assertEquals("Username", authData.username());
     }
 
@@ -77,7 +77,7 @@ public class Service {
     @Order(5)
     @DisplayName("Logout: Success")
     public void logoutSuccess() throws Exception{
-        userDAO.createUser(new UserData("Username", "Password", "email"));
+        USER_DAO.createUser(new UserData("Username", "Password", "email"));
         LoginRequest logReq = new LoginRequest("Username", "Password");
         LoginResult logRes = new UserService().login(logReq);
         LogoutResult logoutRes = new UserService().logout(new LogoutRequest(logRes.authToken()));
@@ -100,7 +100,7 @@ public class Service {
     @Order(7)
     @DisplayName("CreateGame: Success")
     public void createGameSuccess() throws Exception{
-        Integer createResult = gameDAO.createGame("Game 1");
+        Integer createResult = GAME_DAO.createGame("Game 1");
         Assertions.assertNotNull(createResult);
     }
 
@@ -108,7 +108,7 @@ public class Service {
     @Order(8)
     @DisplayName("CreateGame: Game Name Taken")
     public void createGameNameTaken() throws DataAccessException{
-        gameDAO.createGame("Game 1");
+        GAME_DAO.createGame("Game 1");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new GameService().createGame(new CreateRequest("Game 1"));
         });
@@ -120,9 +120,9 @@ public class Service {
     @Order(9)
     @DisplayName("ListGames: Success")
     public void listGamesSuccess() throws Exception{
-        gameDAO.createGame("Game 1");
-        gameDAO.createGame("Game 2");
-        gameDAO.createGame("Game 3");
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.createGame("Game 2");
+        GAME_DAO.createGame("Game 3");
         ListGamesResult listRes = new GameService().listGames(new ListGamesRequest());
         Assertions.assertEquals(3, listRes.games().size());
     }
@@ -143,10 +143,10 @@ public class Service {
     @Order(11)
     @DisplayName("JoinGame: Success")
     public void joinGameSuccess() throws Exception{
-        gameDAO.createGame("Game 1");
+        GAME_DAO.createGame("Game 1");
         JoinGameRequest joinReq = new JoinGameRequest("WHITE", 1, "USER");
         new GameService().joinGame(joinReq);
-        GameData gameData = gameDAO.getGame(1);
+        GameData gameData = GAME_DAO.getGame(1);
         Assertions.assertEquals("USER", gameData.whiteUsername());
     }
 
@@ -154,8 +154,8 @@ public class Service {
     @Order(12)
     @DisplayName("JoinGame: Already Taken")
     public void joinGameAlreadyTaken() throws Exception{
-        gameDAO.createGame("Game 1");
-        gameDAO.updateGame("USER1", "WHITE", 1);
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.updateGame("USER1", "WHITE", 1);
         JoinGameRequest joinReq = new JoinGameRequest("WHITE", 1, "USER2");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new GameService().joinGame(joinReq);
@@ -168,14 +168,14 @@ public class Service {
     @Order(13)
     @DisplayName("Clear: Success")
     public void clearSuccess() throws Exception{
-       gameDAO.createGame("Game 1");
-       userDAO.createUser(new UserData("Username", "Password", "Email"));
-       AuthData authData = authDAO.createAuth("Username");
+        GAME_DAO.createGame("Game 1");
+        USER_DAO.createUser(new UserData("Username", "Password", "Email"));
+       AuthData authData = AUTH_DAO.createAuth("Username");
        String authToken = authData.authToken();
        new UserService().clear(new ClearRequest());
-       Assertions.assertNull(gameDAO.getGame(1));
-       Assertions.assertNull(userDAO.getUser("Username"));
-       Assertions.assertNull(authDAO.getAuth(authToken));
+       Assertions.assertNull(GAME_DAO.getGame(1));
+       Assertions.assertNull(USER_DAO.getUser("Username"));
+       Assertions.assertNull(AUTH_DAO.getAuth(authToken));
     }
 }
 

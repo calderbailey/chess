@@ -9,8 +9,8 @@ import requestresult.*;
 import javax.xml.crypto.Data;
 
 public class UserService {
-    private final UserDAOInterface USER_DAO = new MemoryUserDAO();
-    private final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
+    private final static UserDAOInterface USER_DAO = new MemoryUserDAO();
+    private final static AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
