@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dataaccess.AuthDAOInterface;
 import dataaccess.MemoryAuthDAO;
 import exceptionhandling.DataAccessException;
+import model.AuthData;
 import model.GameData;
 import spark.Request;
 
@@ -30,5 +31,11 @@ public abstract class Handler {
         if (authDAO.getAuth(authToken) == null) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
+    }
+
+    protected String getUsername(String authToken) {
+        AuthDAOInterface authDAO = new MemoryAuthDAO();
+        AuthData authData = authDAO.getAuth(authToken);
+        return authData.username();
     }
 }

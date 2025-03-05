@@ -1,8 +1,6 @@
 package handlers;
 
 import exceptionhandling.DataAccessException;
-import requestresult.CreateRequest;
-import requestresult.CreateResult;
 import requestresult.ListGamesRequest;
 import requestresult.ListGamesResult;
 import service.GameService;

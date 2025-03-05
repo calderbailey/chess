@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.*;
 import exceptionhandling.DataAccessException;
-import model.AuthData;
 import requestresult.*;
 
 public class GameService {
@@ -19,5 +18,14 @@ public class GameService {
     public ListGamesResult listGames(ListGamesRequest listRequest) {
         ListGamesResult listRes = new ListGamesResult(gameDAO.getGameList());
         return listRes;
+    }
+
+    public JoinGameResult joinGame(JoinGameRequest joinRequest) throws DataAccessException {
+        String username = joinRequest.username();
+        String playerColor = joinRequest.playerColor();
+        Integer gameID = joinRequest.gameID();
+        gameDAO.updateGame(username, playerColor, gameID);
+        JoinGameResult joinRes = new JoinGameResult();
+        return joinRes;
     }
 }

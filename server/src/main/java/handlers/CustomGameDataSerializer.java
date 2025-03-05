@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import model.GameData;
 import java.lang.reflect.Type;
+import com.google.gson.JsonNull;
 
 public class CustomGameDataSerializer implements JsonSerializer<GameData> {
     @Override
@@ -13,12 +14,12 @@ public class CustomGameDataSerializer implements JsonSerializer<GameData> {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("gameID", src.gameID());
         if (src.whiteUsername() == null) {
-            jsonObject.addProperty("whiteUsername", "");
+            jsonObject.add("whiteUsername", JsonNull.INSTANCE);
         } else {
             jsonObject.addProperty("whiteUsername", src.whiteUsername());
         }
         if (src.blackUsername() == null) {
-            jsonObject.addProperty("blackUsername", "");
+            jsonObject.add("blackUsername", JsonNull.INSTANCE);
         } else {
             jsonObject.addProperty("blackUsername", src.blackUsername());
         }

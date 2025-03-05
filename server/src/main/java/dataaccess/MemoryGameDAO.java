@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import exceptionhandling.DataAccessException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class MemoryGameDAO implements GameDAOInterface{
 
     @Override
     public void clear() {
-
+        gameMap.clear();
     }
 
     @Override
@@ -47,5 +48,32 @@ public class MemoryGameDAO implements GameDAOInterface{
             gameList.add(game);
         }
         return gameList;
+    }
+
+    @Override
+    public void colorAvailable(String color, Integer gameID) throws DataAccessException{
+        GameData game = gameMap.get(gameID);
+        if (color == null | gameID == null) {
+            throw new DataAccessException("Error: bad request", 400);
+        } else if (!(color.equals("WHITE") | color.equals("BLACK"))) {
+            throw new DataAccessException("Error: bad request", 400);
+        } else if (!((color.equals("WHITE") & game.whiteUsername() == null) |
+                (color.equals("BLACK") & game.blackUsername() == null))) {
+            throw new DataAccessException("Error: already taken", 403);
+        }
+    }
+
+    @Override
+    public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException{
+        colorAvailable(playerColor, gameID);
+        GameData game = gameMap.get(gameID);
+        GameData updatedGame;
+        if (playerColor.equals("WHITE")) {
+            updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
+        } else {
+            updatedGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
+        }
+        gameMap.remove(gameID);
+        gameMap.put(gameID, updatedGame);
     }
 }
