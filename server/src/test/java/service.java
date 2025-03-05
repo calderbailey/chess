@@ -1,5 +1,3 @@
-package passoff.server;
-
 import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import handlers.CreateGameHandler;
