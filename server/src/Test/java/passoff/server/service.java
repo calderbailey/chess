@@ -1,10 +1,7 @@
 package passoff.server;
 
 import chess.ChessGame;
-import dataaccess.AuthDAOInterface;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAOInterface;
+import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import handlers.Handler;
 import handlers.LoginHandler;
@@ -20,6 +17,7 @@ import service.UserService;
 public class service {
     private static final UserDAOInterface userDAO = new MemoryUserDAO();
     private static final AuthDAOInterface authDAO = new MemoryAuthDAO();
+    private static final GameDAOInterface gameDAO = new MemoryGameDAO();
 
     @Test
     @Order(1)
@@ -90,6 +88,26 @@ public class service {
         });
         Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
         Assertions.assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("CreateGame: Success")
+    public void createGameSuccess() throws Exception{
+        Integer createResult = gameDAO.createGame("Game 1");
+        Assertions.assertNotNull(createResult);
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("CreateGame: Game Name Taken")
+    public void createGameNameTaken() throws DataAccessException{
+        gameDAO.createGame("Game 1");
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            gameDAO.createGame("Game 1");
+        });
+        Assertions.assertEquals("Error: game name taken", exception.getDefaultMessage());
+        Assertions.assertEquals(500, exception.getStatusCode());
     }
 }
 

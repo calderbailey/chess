@@ -13,8 +13,13 @@ public class MemoryGameDAO implements GameDAOInterface{
     private static Integer nextGameID = 1;
 
     @Override
-    public Integer createGame(String gameName) {
+    public Integer createGame(String gameName) throws DataAccessException {
         GameData newGame = new GameData(createGameID(),null, null, gameName, new ChessGame());
+        for (Integer gameID : gameMap.keySet()) {
+            if (gameMap.get(gameID).gameName() == gameName) {
+                throw new DataAccessException("Error: game name taken", 500);
+            }
+        }
         gameMap.put(newGame.gameID(), newGame);
         return newGame.gameID();
     }

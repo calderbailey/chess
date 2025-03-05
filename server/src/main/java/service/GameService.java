@@ -8,7 +8,7 @@ public class GameService {
     private final GameDAOInterface gameDAO = new MemoryGameDAO();
     private final AuthDAOInterface authDAO = new MemoryAuthDAO();
 
-    public CreateResult createGame(CreateRequest createRequest) {
+    public CreateResult createGame(CreateRequest createRequest) throws DataAccessException {
         String newGameName = createRequest.gameName();
         Integer newGameID = gameDAO.createGame(newGameName);
         CreateResult createResult = new CreateResult(newGameID);
