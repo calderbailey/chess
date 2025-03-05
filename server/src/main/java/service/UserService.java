@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDAOInterface;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAOInterface;
+import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import model.AuthData;
 import model.UserData;
@@ -45,10 +42,19 @@ public class UserService {
         String authToken = authData.authToken();
         return new LoginResult(usernameResult.username(), authToken);
     }
+
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException{
         String authToken = logoutRequest.authToken();
         authDAO.delAuth(authToken);
         return new LogoutResult();
     }
+
+    public ClearResult clear(ClearRequest clearRequest) {
+        new MemoryAuthDAO().clear();
+        new MemoryUserDAO().clear();
+        new MemoryGameDAO().clear();
+        return new ClearResult();
+    }
+
 
 }

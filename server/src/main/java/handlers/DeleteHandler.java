@@ -1,16 +1,13 @@
 package handlers;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
 import exceptionhandling.DataAccessException;
+import requestresult.ClearRequest;
 import requestresult.ClearResult;
+import service.UserService;
 
 public class DeleteHandler extends Handler{
     public String handleRequest() throws DataAccessException {
-        new MemoryAuthDAO().clear();
-        new MemoryUserDAO().clear();
-        new MemoryGameDAO().clear();
-        return toJson(new ClearResult());
+        ClearResult clearRes = new UserService().clear(new ClearRequest());
+        return toJson(clearRes);
     }
 }

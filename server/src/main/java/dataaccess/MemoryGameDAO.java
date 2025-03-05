@@ -37,6 +37,7 @@ public class MemoryGameDAO implements GameDAOInterface{
     @Override
     public void clear() {
         gameMap.clear();
+        nextGameID = 1;
     }
 
     @Override
@@ -81,4 +82,5 @@ public class MemoryGameDAO implements GameDAOInterface{
         gameMap.remove(gameID);
         gameMap.put(gameID, updatedGame);
     }
+
 }

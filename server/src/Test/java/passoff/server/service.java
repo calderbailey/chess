@@ -1,12 +1,8 @@
 package passoff.server;
 
-import chess.ChessGame;
 import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import handlers.CreateGameHandler;
-import handlers.Handler;
-import handlers.LoginHandler;
-import handlers.LogoutHandler;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -21,6 +17,13 @@ public class service {
     private static final UserDAOInterface userDAO = new MemoryUserDAO();
     private static final AuthDAOInterface authDAO = new MemoryAuthDAO();
     private static final GameDAOInterface gameDAO = new MemoryGameDAO();
+
+    @BeforeEach
+    public void setup() {
+        userDAO.clear();
+        authDAO.clear();
+        gameDAO.clear();
+    }
 
     @Test
     @Order(1)
@@ -117,7 +120,7 @@ public class service {
     @Order(9)
     @DisplayName("ListGames: Success")
     public void listGamesSuccess() throws Exception{
-        gameDAO.createGame("Game1");
+        gameDAO.createGame("Game 1");
         gameDAO.createGame("Game 2");
         gameDAO.createGame("Game 3");
         ListGamesResult listRes = new GameService().listGames(new ListGamesRequest());
@@ -159,6 +162,20 @@ public class service {
         });
         Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
         Assertions.assertEquals(403, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("Clear: Success")
+    public void clearSuccess() throws Exception{
+       gameDAO.createGame("Game 1");
+       userDAO.createUser(new UserData("Username", "Password", "Email"));
+       AuthData authData = authDAO.createAuth("Username");
+       String authToken = authData.authToken();
+       new UserService().clear(new ClearRequest());
+       Assertions.assertNull(gameDAO.getGame(1));
+       Assertions.assertNull(userDAO.getUser("Username"));
+       Assertions.assertNull(authDAO.getAuth(authToken));
     }
 }
 
