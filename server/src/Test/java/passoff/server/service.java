@@ -13,7 +13,7 @@ import service.GameService;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class Service {
+public class service {
     private static final UserDAOInterface USER_DAO = new MemoryUserDAO();
     private static final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
     private static final GameDAOInterface GAME_DAO = new MemoryGameDAO();
