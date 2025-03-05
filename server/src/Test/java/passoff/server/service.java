@@ -3,6 +3,7 @@ package passoff.server;
 import chess.ChessGame;
 import dataaccess.*;
 import exceptionhandling.DataAccessException;
+import handlers.CreateGameHandler;
 import handlers.Handler;
 import handlers.LoginHandler;
 import handlers.LogoutHandler;
@@ -11,6 +12,7 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import requestresult.*;
 import service.UserService;
+import service.GameService;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -104,10 +106,33 @@ public class service {
     public void createGameNameTaken() throws DataAccessException{
         gameDAO.createGame("Game 1");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.createGame("Game 1");
+            new GameService().createGame(new CreateRequest("Game 1"));
         });
         Assertions.assertEquals("Error: game name taken", exception.getDefaultMessage());
         Assertions.assertEquals(500, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("ListGames: Success")
+    public void listGamesSuccess() throws Exception{
+        gameDAO.createGame("Game1");
+        gameDAO.createGame("Game 2");
+        gameDAO.createGame("Game 3");
+        ListGamesResult listRes = new GameService().listGames(new ListGamesRequest());
+        Assertions.assertEquals(3, listRes.games().size());
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("ListGames: Unauthorized")
+    public void listGamesUnauthorized() throws DataAccessException{
+        //Authorization Check Occurs at the Handler Level.
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            new CreateGameHandler().checkAuth("wrong");
+        });
+        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals(401, exception.getStatusCode());
     }
 }
 
