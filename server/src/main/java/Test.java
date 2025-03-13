@@ -16,5 +16,6 @@ public class Test {
         Integer gameID = sgame.createGame("GAME 1");
         GameData gameData = sgame.getGame(gameID);
         System.out.printf(gameData.toString());
+        sgame.clear();
     }
 }

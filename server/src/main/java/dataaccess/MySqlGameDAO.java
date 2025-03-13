@@ -45,7 +45,16 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException{
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "DROP TABLE IF EXISTS games, nextGameID";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to clear game data: %s", e.getMessage()), 500);
+        }
+        configureDatabase();
     }
 
     @Override

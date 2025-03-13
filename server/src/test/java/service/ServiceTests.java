@@ -17,7 +17,7 @@ public class ServiceTests {
     private static final GameDAOInterface GAME_DAO = new MemoryGameDAO();
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws DataAccessException{
         USER_DAO.clear();
         AUTH_DAO.clear();
         GAME_DAO.clear();
