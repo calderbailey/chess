@@ -5,7 +5,7 @@ import exceptionhandling.*;
 import java.sql.SQLException;
 
 public abstract class MySqlDAO {
-    public void configureDatabase() throws DataAccessException, ResponseException{
+    public void configureDatabase() throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : getCreateStatements()) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -13,7 +13,7 @@ public abstract class MySqlDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()), 500);
         }
     }
 

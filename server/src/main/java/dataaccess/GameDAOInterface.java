@@ -8,7 +8,7 @@ public interface GameDAOInterface {
     Integer createGame(String gameName) throws DataAccessException;
     GameData getGame(Integer gameID);
     void clear();
-    Integer createGameID();
+    Integer createGameID() throws DataAccessException;
     ArrayList<GameData> getGameList();
     void colorAvailable(String color, Integer gameID) throws DataAccessException;
     void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException;
