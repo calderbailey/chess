@@ -51,4 +51,17 @@ public abstract class MySqlDAO {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()), 500);
         }
     }
+
+    protected void clearHelper(String... tableNames) throws DataAccessException{
+        try (var conn = DatabaseManager.getConnection()) {
+            String tables = String.join(", ", tableNames);
+            String statement = "DROP TABLE IF EXISTS " + tables;
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to clear game data: %s", e.getMessage()), 500);
+        }
+        configureDatabase();
+    }
 }
