@@ -4,8 +4,23 @@ import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import requestresult.*;
 
-public class GameService {
-    private final static GameDAOInterface GAME_DAO = new MemoryGameDAO();
+public class GameService<gameDAO> extends Service{
+
+    private static final GameDAOInterface GAME_DAO;
+
+    static {
+        if ("MySql".equals(DATABASE_METHOD)) {
+            try {
+                GAME_DAO = new MySqlGameDAO();
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            GAME_DAO = new MemoryGameDAO();
+            throw new RuntimeException();
+
+        }
+    }
 
     public CreateResult createGame(CreateRequest createRequest) throws DataAccessException {
         String newGameName = createRequest.gameName();
