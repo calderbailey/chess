@@ -75,8 +75,23 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     }
 
     @Override
-    public ArrayList<GameData> getGameList() {
-        return null;
+    public ArrayList<GameData> getGameList() throws DataAccessException{
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT jsonChessGame FROM games";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    ArrayList<GameData> gameList = new ArrayList<>();
+                    while (rs.next()) {
+                        String gameDataJson = rs.getString(1);
+                        GameData gameData = new Gson().fromJson(gameDataJson, GameData.class);
+                        gameList.add(gameData);
+                    }
+                    return gameList;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+        }
     }
 
     @Override
