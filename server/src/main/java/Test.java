@@ -4,6 +4,7 @@ import dataaccess.MySqlGameDAO;
 import exceptionhandling.DataAccessException;
 import java.sql.Connection;
 import dataaccess.*;
+import model.GameData;
 import requestresult.CreateRequest;
 import requestresult.CreateResult;
 import service.GameService;
@@ -11,9 +12,9 @@ import service.GameService;
 public class Test {
     public static void main(String[] args) throws Exception {
         // Call createDatabase() normally
-        GameService game = new GameService();
-        CreateResult res;
-        res = game.createGame(new CreateRequest("GAME 1"));
-        System.out.printf(String.valueOf(res.gameID()));
+        MySqlGameDAO sgame = new MySqlGameDAO();
+        Integer gameID = sgame.createGame("GAME 1");
+        GameData gameData = sgame.getGame(gameID);
+        System.out.printf(gameData.toString());
     }
 }

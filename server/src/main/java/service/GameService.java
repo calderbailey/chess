@@ -29,7 +29,7 @@ public class GameService<gameDAO> extends Service{
         return createResult;
     }
 
-    public ListGamesResult listGames(ListGamesRequest listRequest) {
+    public ListGamesResult listGames(ListGamesRequest listRequest) throws DataAccessException {
         ListGamesResult listRes = new ListGamesResult(GAME_DAO.getGameList());
         return listRes;
     }
