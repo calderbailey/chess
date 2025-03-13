@@ -5,7 +5,13 @@ import exceptionhandling.*;
 import java.sql.SQLException;
 
 public abstract class MySqlDAO {
-    public void configureDatabase() throws DataAccessException{
+
+    protected MySqlDAO() throws DataAccessException {
+        configureDatabase();
+    }
+
+    protected void configureDatabase() throws DataAccessException{
+        DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : getCreateStatements()) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {

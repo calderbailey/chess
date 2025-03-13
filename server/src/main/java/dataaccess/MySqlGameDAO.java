@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import exceptionhandling.*;
 import model.GameData;
 
@@ -10,9 +12,19 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
+
+    public MySqlGameDAO() throws DataAccessException {
+        super();
+    }
+
     @Override
     public Integer createGame(String gameName) throws DataAccessException {
-        return 0;
+        var statement = "INSERT INTO games (gameID, jsonChessGame) VALUES (?, ?)";
+        Integer gameID = createGameID();
+        GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
+        String json = new Gson().toJson(newGame);
+        executeUpdate(statement, gameID, json);
+        return gameID;
     }
 
     @Override
@@ -22,7 +34,6 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
 
     @Override
     public void clear() {
-
     }
 
     @Override
@@ -89,7 +100,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
         };
     }
 
-    private int executeUpdate(String statement, Object... params) throws Exception {
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
