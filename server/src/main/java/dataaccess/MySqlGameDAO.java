@@ -5,7 +5,7 @@ import model.GameData;
 
 import java.util.ArrayList;
 
-public class MySqlGameDAO implements GameDAOInterface{
+public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     @Override
     public Integer createGame(String gameName) throws DataAccessException {
         return 0;
@@ -39,5 +39,20 @@ public class MySqlGameDAO implements GameDAOInterface{
     @Override
     public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException {
 
+    }
+
+    @Override
+    protected final String[] getCreateStatements() {
+        return new String[]{
+                """
+            CREATE TABLE IF NOT EXISTS  Games (
+              `id` int NOT NULL AUTO_INCREMENT,
+              `gameID` int NOT NULL,
+              `jsonChessGame` TEXT NOT NULL,
+              PRIMARY KEY (`id`),
+              INDEX(gameID)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+        };
     }
 }

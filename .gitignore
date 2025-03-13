@@ -14,4 +14,8 @@ server/**/db.properties
 
 ### Test File ###
 shared/src/test/java/Test.java
+server/src/main/java/Test.java
+
+### Properties Config File ###
+server/src/main/resources/db.properties
 
