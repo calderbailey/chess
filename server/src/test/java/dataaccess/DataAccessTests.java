@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DataAccessTests {
-    private static final UserDAOInterface USER_DAO = new MemoryUserDAO();
+    private static final UserDAOInterface USER_DAO;
     private static final AuthDAOInterface AUTH_DAO;
     private static final GameDAOInterface GAME_DAO;
 
@@ -24,6 +24,7 @@ public class DataAccessTests {
         try {
             GAME_DAO = new MySqlGameDAO();
             AUTH_DAO = new MySqlAuthDAO();
+            USER_DAO = new MySqlUserDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -77,68 +78,45 @@ public class DataAccessTests {
         Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
     }
 
-//    @Test
-//    @Order(2)
-//    @DisplayName("Register: User Taken")
-//    public void registerUserTaken() {
-//        USER_DAO.createUser(new UserData("Username", "Password", "EMAIL@GMAIL.COM"));
-//        RegisterRequest regReq = new RegisterRequest("Username", "Password", "EMAIL@GMAIL.COM");
-//        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-//            new UserService().register(regReq);
-//        });
-//        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
-//        Assertions.assertEquals(403, exception.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(3)
-//    @DisplayName("Login: Success")
-//    public void loginSuccess() throws Exception{
-//        USER_DAO.createUser(new UserData("Username", "Password", "email"));
-//        LoginRequest logReq = new LoginRequest("Username", "Password");
-//        LoginResult logRes = new UserService().login(logReq);
-//        String authToken = logRes.authToken();
-//        AuthData authData = AUTH_DAO.getAuth(authToken);
-//        Assertions.assertEquals("Username", authData.username());
-//    }
-//
-//    @Test
-//    @Order(4)
-//    @DisplayName("Login: Unauthorized")
-//    public void loginUnauthorized() {
-//        LoginRequest logReq = new LoginRequest("Username", "Password");
-//        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-//            new UserService().login(logReq);
-//        });
-//        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
-//        Assertions.assertEquals(401, exception.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(5)
-//    @DisplayName("Logout: Success")
-//    public void logoutSuccess() throws Exception{
-//        USER_DAO.createUser(new UserData("Username", "Password", "email"));
-//        LoginRequest logReq = new LoginRequest("Username", "Password");
-//        LoginResult logRes = new UserService().login(logReq);
-//        LogoutResult logoutRes = new UserService().logout(new LogoutRequest(logRes.authToken()));
-//        Assertions.assertEquals(new LogoutResult(), logoutRes);
-//    }
-//
-//    @Test
-//    @Order(6)
-//    @DisplayName("Logout: Unauthorized")
-//    public void logoutUnauthorized() {
-//        LogoutRequest logReq = new LogoutRequest("wrong");
-//        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-//            new UserService().logout(logReq);
-//        });
-//        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
-//        Assertions.assertEquals(401, exception.getStatusCode());
-//    }
+    @Test
+    @Order(6)
+    @DisplayName("getUser: Success")
+    public void getUserSuccess() throws DataAccessException{
+        UserData testUserData = new UserData("User", "Password", "email");
+        USER_DAO.createUser(testUserData);
+        UserData userData = USER_DAO.getUser(testUserData.username());
+        Assertions.assertEquals(testUserData, userData);
+    }
 
     @Test
     @Order(7)
+    @DisplayName("getUser: Does Not Exist")
+    public void getUserBadRequest() throws DataAccessException{
+        Assertions.assertNull(USER_DAO.getUser("WRONG USERNAME"));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("createUser: Success")
+    public void createUserSuccess() throws DataAccessException{
+        UserData testUserData = new UserData("User", "Password", "email");
+        USER_DAO.createUser(testUserData);
+        UserData userData = USER_DAO.getUser(testUserData.username());
+        Assertions.assertEquals(testUserData, userData);
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("userDAOClear: Success")
+    public void userDAOClearSuccess() throws Exception{
+        USER_DAO.createUser(new UserData("User 1", "Password", "Email"));
+        Assertions.assertNotNull(USER_DAO.getUser("User 1"));
+        USER_DAO.clear();
+        Assertions.assertNull(USER_DAO.getUser("User 1"));
+    }
+
+    @Test
+    @Order(10)
     @DisplayName("createGame: Success")
     public void createGameSuccess() throws Exception{
         Integer createResult = GAME_DAO.createGame("Game 1");
@@ -146,7 +124,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(8)
+    @Order(11)
     @DisplayName("createGame: Game Name Taken")
     public void createGameNameTaken() throws DataAccessException{
         GAME_DAO.createGame("Game 1");
@@ -158,7 +136,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(9)
+    @Order(12)
     @DisplayName("getGameList: Success")
     public void getGameListSuccess() throws Exception{
 
@@ -176,7 +154,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(10)
+    @Order(13)
     @DisplayName("getGameList: Unauthorized")
     public void getGameListUnauthorized() throws DataAccessException{
         //Authorization Check Occurs at the Handler Level.
@@ -188,7 +166,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(11)
+    @Order(14)
     @DisplayName("getGame: Success")
     public void getGameSuccess() throws Exception{
         GameData testGame = new GameData(1, null, null, "Game 1", new ChessGame());
@@ -198,7 +176,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(12)
+    @Order(15)
     @DisplayName("getGame: GameID Doesn't Exist")
     public void getGameBadID() throws Exception{
         GameData game = GAME_DAO.getGame(1);
@@ -206,7 +184,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(13)
+    @Order(16)
     @DisplayName("gameDAOClear: Success")
     public void gameDAOClearSuccess() throws Exception{
         GAME_DAO.createGame("Game 1");
@@ -216,7 +194,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(14)
+    @Order(17)
     @DisplayName("createGameID: Success")
     public void createGameIDSuccess() throws Exception{
         Integer gameID_1 = GAME_DAO.createGameID();
@@ -228,7 +206,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(15)
+    @Order(18)
     @DisplayName("updateGame: Success")
     public void updateGameSuccess() throws Exception{
         GameData testGame = new GameData(1, null, "USER", "Game 1", new ChessGame());
@@ -239,7 +217,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(16)
+    @Order(19)
     @DisplayName("updateGame: Bad Request")
     public void updateGameBadRequest() throws Exception{
         GameData testGame = new GameData(1, null, "USER", "Game 1", new ChessGame());
@@ -251,7 +229,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(17)
+    @Order(20)
     @DisplayName("colorAvailable: Success")
     public void colorAvailableSuccess() throws Exception{
         GAME_DAO.createGame("Game 1");
@@ -260,7 +238,7 @@ public class DataAccessTests {
     }
 
     @Test
-    @Order(18)
+    @Order(21)
     @DisplayName("colorAvailable: Unavailable")
     public void colorAvailableUnavailable() throws Exception{
         GAME_DAO.createGame("Game 1");

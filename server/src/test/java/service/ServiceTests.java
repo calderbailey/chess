@@ -37,7 +37,7 @@ public class ServiceTests {
     @Test
     @Order(2)
     @DisplayName("Register: User Taken")
-    public void registerUserTaken() {
+    public void registerUserTaken() throws DataAccessException {
         USER_DAO.createUser(new UserData("Username", "Password", "EMAIL@GMAIL.COM"));
         RegisterRequest regReq = new RegisterRequest("Username", "Password", "EMAIL@GMAIL.COM");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
