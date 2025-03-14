@@ -4,10 +4,9 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptionhandling.*;
 import model.GameData;
-import java.sql.SQLException;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
 
@@ -17,18 +16,50 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
 
     @Override
     public Integer createGame(String gameName) throws DataAccessException {
-        var statement = "INSERT INTO games (gameID, jsonChessGame) VALUES (?, ?)";
-        Integer gameID = createGameID();
-        GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
-        String json = new Gson().toJson(newGame);
-        executeUpdate(statement, gameID, json);
-        return gameID;
+        if (isNameUnique(gameName)) {
+            String updateStatement = "INSERT INTO games (gameID, jsonChessGame) VALUES (?, ?)";
+            Integer gameID = createGameID();
+            GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
+            String json = new Gson().toJson(newGame);
+            executeUpdate(updateStatement, gameID, json);
+            return gameID;
+        } else {
+            throw new DataAccessException("Error: game name taken", 500);            }
+    }
+
+    private boolean isNameUnique(String gameName) throws DataAccessException {
+        ArrayList<GameData> allGames = getAllGames();
+        for (GameData game : allGames) {
+            if (gameName.equals(game.gameName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private ArrayList<GameData> getAllGames() throws DataAccessException{
+        ArrayList<GameData> allGames = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT jsonChessGame FROM games";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String json = rs.getString("jsonChessGame");
+                        GameData gameData = new Gson().fromJson(json, GameData.class);
+                        allGames.add(gameData);
+                    }
+                    return allGames;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+        }
     }
 
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT jsonChessGame FROM games WHERE gameID=?";
+            String statement = "SELECT jsonChessGame FROM games WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -96,12 +127,39 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
 
     @Override
     public void colorAvailable(String color, Integer gameID) throws DataAccessException {
-
+        if (color == null | gameID == null) {
+            throw new DataAccessException("Error: bad request", 400);
+        } else if (!(color.equals("WHITE") | color.equals("BLACK"))) {
+            throw new DataAccessException("Error: bad request", 400);
+        } else {
+            GameData game = getGame(gameID);
+            if (!((color.equals("WHITE") & game.whiteUsername() == null) |
+                (color.equals("BLACK") & game.blackUsername() == null))) {
+                throw new DataAccessException("Error: already taken", 403);
+            }
+        }
     }
 
     @Override
     public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException {
-
+        colorAvailable(playerColor, gameID);
+        GameData game = getGame(gameID);
+        GameData updatedGame;
+        if (playerColor.equals("WHITE")) {
+            updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
+        } else {
+            updatedGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
+        }
+        String gameJson = new Gson().toJson(updatedGame, GameData.class);
+        String statement = "UPDATE games SET jsonChessGame = ? WHERE gameID = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, gameJson);
+            ps.setInt(2, gameID);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+        }
     }
 
     @Override
