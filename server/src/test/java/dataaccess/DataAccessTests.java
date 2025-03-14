@@ -68,6 +68,15 @@ public class DataAccessTests {
         Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
     }
 
+    @Test
+    @Order(5)
+    @DisplayName("delAuth: Success")
+    public void delAuthSuccess() throws DataAccessException{
+        AuthData authData = AUTH_DAO.createAuth("USER");
+        AUTH_DAO.delAuth(authData.authToken());
+        Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
+    }
+
 //    @Test
 //    @Order(2)
 //    @DisplayName("Register: User Taken")

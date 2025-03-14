@@ -55,7 +55,16 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
 
     @Override
     public void delAuth(String authToken) throws DataAccessException {
-
+        AuthData authData = getAuth(authToken);
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "DELETE FROM auth WHERE username = ?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authData.username());
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+        }
     }
 
     @Override
