@@ -147,8 +147,10 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
         GameData updatedGame;
         if (playerColor.equals("WHITE")) {
             updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
-        } else {
+        } else if (playerColor.equals("BLACK")) {
             updatedGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
+        } else {
+            throw new DataAccessException("Error: bad request", 400);
         }
         String gameJson = new Gson().toJson(updatedGame, GameData.class);
         String statement = "UPDATE games SET jsonChessGame = ? WHERE gameID = ?";

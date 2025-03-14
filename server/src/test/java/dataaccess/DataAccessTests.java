@@ -176,13 +176,70 @@ public class DataAccessTests {
 
     @Test
     @Order(13)
-    @DisplayName("Clear: Success")
+    @DisplayName("clear: Success")
     public void clearSuccess() throws Exception{
         GAME_DAO.createGame("Game 1");
         GAME_DAO.createGame("Game 2");
         GAME_DAO.createGame("Game 3");
         GAME_DAO.clear();
         Assertions.assertEquals(0, GAME_DAO.getGameList().size());
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("createGameID: Success")
+    public void createGameIDSuccess() throws Exception{
+        Integer gameID_1 = GAME_DAO.createGameID();
+        Integer gameID_2 = GAME_DAO.createGameID();
+        Integer gameID_3 = GAME_DAO.createGameID();
+        Assertions.assertEquals(1, gameID_1);
+        Assertions.assertEquals(2, gameID_2);
+        Assertions.assertEquals(3, gameID_3);
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("updateGame: Success")
+    public void updateGameSuccess() throws Exception{
+        GameData testGame = new GameData(1, null, "USER", "Game 1", new ChessGame());
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.updateGame("USER", "BLACK", 1);
+        GameData game = GAME_DAO.getGame(1);
+        Assertions.assertEquals(testGame, game);
+    }
+
+    @Test
+    @Order(16)
+    @DisplayName("updateGame: Bad Request")
+    public void updateGameBadRequest() throws Exception{
+        GameData testGame = new GameData(1, null, "USER", "Game 1", new ChessGame());
+        GAME_DAO.createGame("Game 1");
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            GAME_DAO.updateGame("USER", "black", 1);        });
+        Assertions.assertEquals("Error: bad request", exception.getDefaultMessage());
+        Assertions.assertEquals(400, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(17)
+    @DisplayName("colorAvailable: Success")
+    public void colorAvailableSuccess() throws Exception{
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.updateGame("USER", "BLACK", 1);
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.colorAvailable("WHITE", 1));
+    }
+
+    @Test
+    @Order(18)
+    @DisplayName("colorAvailable: Unavailable")
+    public void colorAvailableUnavailable() throws Exception{
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.updateGame("USER", "BLACK", 1);
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            GAME_DAO.colorAvailable("BLACK", 1);
+        });
+        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
+        Assertions.assertEquals(403, exception.getStatusCode());
     }
 }
 
