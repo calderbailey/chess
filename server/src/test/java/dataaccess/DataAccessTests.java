@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import exceptionhandling.DataAccessException;
 import handlers.CreateGameHandler;
 import model.AuthData;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.*;
 import requestresult.*;
 import service.GameService;
 import service.UserService;
+
+import java.util.ArrayList;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -105,7 +108,7 @@ public class DataAccessTests {
 
     @Test
     @Order(7)
-    @DisplayName("CreateGame: Success")
+    @DisplayName("createGame: Success")
     public void createGameSuccess() throws Exception{
         Integer createResult = GAME_DAO.createGame("Game 1");
         Assertions.assertNotNull(createResult);
@@ -113,7 +116,7 @@ public class DataAccessTests {
 
     @Test
     @Order(8)
-    @DisplayName("CreateGame: Game Name Taken")
+    @DisplayName("createGame: Game Name Taken")
     public void createGameNameTaken() throws DataAccessException{
         GAME_DAO.createGame("Game 1");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
@@ -123,40 +126,39 @@ public class DataAccessTests {
         Assertions.assertEquals(500, exception.getStatusCode());
     }
 
-//    @Test
-//    @Order(9)
-//    @DisplayName("ListGames: Success")
-//    public void listGamesSuccess() throws Exception{
-//        GAME_DAO.createGame("Game 1");
-//        GAME_DAO.createGame("Game 2");
-//        GAME_DAO.createGame("Game 3");
-//        ListGamesResult listRes = new GameService().listGames(new ListGamesRequest());
-//        Assertions.assertEquals(3, listRes.games().size());
-//    }
-//
-//    @Test
-//    @Order(10)
-//    @DisplayName("ListGames: Unauthorized")
-//    public void listGamesUnauthorized() throws DataAccessException{
-//        //Authorization Check Occurs at the Handler Level.
-//        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-//            new CreateGameHandler().checkAuth("wrong");
-//        });
-//        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
-//        Assertions.assertEquals(401, exception.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(11)
-//    @DisplayName("JoinGame: Success")
-//    public void joinGameSuccess() throws Exception{
-//        GAME_DAO.createGame("Game 1");
-//        JoinGameRequest joinReq = new JoinGameRequest("WHITE", 1, "USER");
-//        new GameService().joinGame(joinReq);
-//        GameData gameData = GAME_DAO.getGame(1);
-//        Assertions.assertEquals("USER", gameData.whiteUsername());
-//    }
-//
+    @Test
+    @Order(9)
+    @DisplayName("getGameList: Success")
+    public void getGameListSuccess() throws Exception{
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.createGame("Game 2");
+        GAME_DAO.createGame("Game 3");
+        ArrayList<GameData> allGames = GAME_DAO.getGameList();
+        Assertions.assertEquals(3, allGames.size());
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("getGameList: Unauthorized")
+    public void getGameListUnauthorized() throws DataAccessException{
+        //Authorization Check Occurs at the Handler Level.
+        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
+            new CreateGameHandler().checkAuth("wrong");
+        });
+        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("getGame: Success")
+    public void getGameSuccess() throws Exception{
+        GameData testGame = new GameData(1, null, null, "Game 1", new ChessGame());
+        GAME_DAO.createGame("Game 1");
+        GameData game = GAME_DAO.getGame(1);
+        Assertions.assertEquals(testGame, game);
+    }
+
 //    @Test
 //    @Order(12)
 //    @DisplayName("JoinGame: Already Taken")
