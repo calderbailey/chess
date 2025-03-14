@@ -17,6 +17,7 @@ public class Test {
     public static void main(String[] args) throws Exception {
         // Call createDatabase() normally
         MySqlGameDAO sgame = new MySqlGameDAO();
+        MySqlAuthDAO sauth = new MySqlAuthDAO();
         sgame.createGame("HELLO");
         sgame.createGame("HELL3O");
         ArrayList<GameData> gameList = sgame.getGameList();

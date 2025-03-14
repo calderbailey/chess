@@ -4,8 +4,6 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptionhandling.*;
 import model.GameData;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
@@ -17,7 +15,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     @Override
     public Integer createGame(String gameName) throws DataAccessException {
         if (isNameUnique(gameName)) {
-            String updateStatement = "INSERT INTO games (gameID, jsonChessGame) VALUES (?, ?)";
+            String updateStatement = "INSERT INTO games (gameID, jsonGameData) VALUES (?, ?)";
             Integer gameID = createGameID();
             GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
             String json = new Gson().toJson(newGame);
@@ -40,11 +38,11 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     private ArrayList<GameData> getAllGames() throws DataAccessException{
         ArrayList<GameData> allGames = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT jsonChessGame FROM games";
+            String statement = "SELECT jsonGameData FROM games";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        String json = rs.getString("jsonChessGame");
+                        String json = rs.getString("jsonGameData");
                         GameData gameData = new Gson().fromJson(json, GameData.class);
                         allGames.add(gameData);
                     }
@@ -59,12 +57,12 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT jsonChessGame FROM games WHERE gameID=?";
+            String statement = "SELECT jsonGameData FROM games WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        String json = rs.getString("jsonChessGame");
+                        String json = rs.getString("jsonGameData");
                         return new Gson().fromJson(json, GameData.class);
                     }
                 }
@@ -108,7 +106,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     @Override
     public ArrayList<GameData> getGameList() throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT jsonChessGame FROM games";
+            var statement = "SELECT jsonGameData FROM games";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     ArrayList<GameData> gameList = new ArrayList<>();
@@ -153,7 +151,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
             throw new DataAccessException("Error: bad request", 400);
         }
         String gameJson = new Gson().toJson(updatedGame, GameData.class);
-        String statement = "UPDATE games SET jsonChessGame = ? WHERE gameID = ?";
+        String statement = "UPDATE games SET jsonGameData = ? WHERE gameID = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement)) {
             ps.setString(1, gameJson);
@@ -169,24 +167,23 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
         return new String[]{
                 """
             CREATE TABLE IF NOT EXISTS  games (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `gameID` int NOT NULL DEFAULT 0,
-              `jsonChessGame` TEXT NOT NULL,
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `gameID` int NOT NULL,
+              `jsonGameData` TEXT NOT NULL,
               PRIMARY KEY (`id`),
               INDEX(gameID)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
                 """
             CREATE TABLE IF NOT EXISTS  nextGameID (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `gameID` int NOT NULL DEFAULT 1,
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `gameID` INT NOT NULL DEFAULT 1,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
                 """
             INSERT INTO nextGameID (gameID) VALUES (DEFAULT)
             """
-
         };
     }
 }
