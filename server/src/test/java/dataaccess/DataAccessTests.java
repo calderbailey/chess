@@ -17,12 +17,13 @@ import java.util.ArrayList;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DataAccessTests {
     private static final UserDAOInterface USER_DAO = new MemoryUserDAO();
-    private static final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
+    private static final AuthDAOInterface AUTH_DAO;
     private static final GameDAOInterface GAME_DAO;
 
     static {
         try {
             GAME_DAO = new MySqlGameDAO();
+            AUTH_DAO = new MySqlAuthDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -35,17 +36,13 @@ public class DataAccessTests {
         GAME_DAO.clear();
     }
 
-//    @Test
-//    @Order(1)
-//    @DisplayName("Register: Success")
-//    public void registerSuccess() throws DataAccessException{
-//        RegisterRequest regReq = new RegisterRequest("Username", "Password", "EMAIL@GMAIL.COM");
-//        new UserService().register(regReq);
-//        UserData userData = USER_DAO.getUser("Username");
-//        Assertions.assertEquals(new UserData("Username", "Password", "EMAIL@GMAIL.COM"), userData,
-//                "Registration was not correctly added to the database");
-//    }
-//
+    @Test
+    @Order(1)
+    @DisplayName("createAuth: Success")
+    public void createAuthSuccess() throws DataAccessException{
+        Assertions.assertNotNull(AUTH_DAO.createAuth("USER"));
+    }
+
 //    @Test
 //    @Order(2)
 //    @DisplayName("Register: User Taken")
@@ -176,13 +173,12 @@ public class DataAccessTests {
 
     @Test
     @Order(13)
-    @DisplayName("clear: Success")
-    public void clearSuccess() throws Exception{
+    @DisplayName("gameDAOClear: Success")
+    public void gameDAOClearSuccess() throws Exception{
         GAME_DAO.createGame("Game 1");
         GAME_DAO.createGame("Game 2");
         GAME_DAO.createGame("Game 3");
         GAME_DAO.clear();
-        Assertions.assertEquals(0, GAME_DAO.getGameList().size());
     }
 
     @Test

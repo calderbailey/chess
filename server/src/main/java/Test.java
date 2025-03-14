@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 
 import dataaccess.*;
+import model.AuthData;
 import model.GameData;
 import requestresult.CreateRequest;
 import requestresult.CreateResult;
@@ -18,6 +19,7 @@ public class Test {
         // Call createDatabase() normally
         MySqlGameDAO sgame = new MySqlGameDAO();
         MySqlAuthDAO sauth = new MySqlAuthDAO();
+        AuthData user = sauth.createAuth("USER");
         sgame.createGame("HELLO");
         sgame.createGame("HELL3O");
         ArrayList<GameData> gameList = sgame.getGameList();

@@ -1,7 +1,12 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import exceptionhandling.DataAccessException;
 import model.AuthData;
+import model.GameData;
+
+import java.util.UUID;
 
 public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
 
@@ -9,8 +14,12 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
     }
 
     @Override
-    public AuthData createAuth(String username) {
-        return null;
+    public AuthData createAuth(String username) throws DataAccessException {
+        String updateStatement = "INSERT INTO auth (username, jsonAuthData) VALUES (?, ?)";
+        AuthData authData = new AuthData(generateToken(), username);
+        String json = new Gson().toJson(authData);
+        executeUpdate(updateStatement, username, json);
+        return authData;
     }
 
     @Override
@@ -24,7 +33,8 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
+        clearHelper("auth");
     }
 
     @Override
@@ -40,6 +50,10 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
         };
+    }
+
+    private String generateToken() {
+        return UUID.randomUUID().toString();
     }
 
 }
