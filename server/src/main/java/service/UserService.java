@@ -9,25 +9,22 @@ import requestresult.*;
 import javax.xml.crypto.Data;
 
 public class UserService extends Service{
-//
-//    private final static UserDAOInterface USER_DAO;
-//    private final static AuthDAOInterface AUTH_DAO;
-//
-//    static {
-//        if ("MySql".equals(DATABASE_METHOD)) {
-//            try {
-//                USER_DAO = new MySqlUserDAO();
-//                AUTH_DAO = new MySqlAuthDAO();
-//            } catch (DataAccessException e) {
-//                throw new RuntimeException(e);
-//            }
-//        } else {
-//            USER_DAO = new MemoryUserDAO();
-//            AUTH_DAO = new MemoryAuthDAO();        }
-//    }
 
-    private final static UserDAOInterface USER_DAO = new MemoryUserDAO();
-    private final static AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
+    private final static UserDAOInterface USER_DAO;
+    private final static AuthDAOInterface AUTH_DAO;
+
+    static {
+        if ("MySql".equals(DATABASE_METHOD)) {
+            try {
+                USER_DAO = new MySqlUserDAO();
+                AUTH_DAO = new MySqlAuthDAO();
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            USER_DAO = new MemoryUserDAO();
+            AUTH_DAO = new MemoryAuthDAO();        }
+    }
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
