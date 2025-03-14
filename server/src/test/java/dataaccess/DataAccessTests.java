@@ -43,6 +43,31 @@ public class DataAccessTests {
         Assertions.assertNotNull(AUTH_DAO.createAuth("USER"));
     }
 
+    @Test
+    @Order(2)
+    @DisplayName("getAuth: Success")
+    public void getAuthSuccess() throws DataAccessException{
+        AuthData originalAuthData = AUTH_DAO.createAuth("USER");
+        AuthData newAuthData = AUTH_DAO.getAuth(originalAuthData.authToken());
+        Assertions.assertEquals(originalAuthData, newAuthData);
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("getAuth: Authorization Doesn't Exist")
+    public void getAuthBadRequest() throws DataAccessException{
+        Assertions.assertNull(AUTH_DAO.getAuth("WRONG TOKEN"));
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("authDAOClear: Success")
+    public void authDAOClearSuccess() throws DataAccessException{
+        AuthData authData = AUTH_DAO.createAuth("USER");
+        AUTH_DAO.clear();
+        Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
+    }
+
 //    @Test
 //    @Order(2)
 //    @DisplayName("Register: User Taken")

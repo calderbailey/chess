@@ -33,7 +33,7 @@ public abstract class Handler {
         }
     }
 
-    protected String getUsername(String authToken) {
+    protected String getUsername(String authToken) throws DataAccessException {
         AuthDAOInterface authDAO = new MemoryAuthDAO();
         AuthData authData = authDAO.getAuth(authToken);
         return authData.username();

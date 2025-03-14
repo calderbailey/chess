@@ -6,6 +6,7 @@ import exceptionhandling.DataAccessException;
 import model.AuthData;
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
@@ -23,8 +24,33 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        ArrayList<AuthData> allAuth = getAllAuth();
+        for (AuthData authData : allAuth) {
+            if (authData.authToken().equals(authToken)) {
+                return authData;
+            }
+        }
         return null;
+    }
+
+    private ArrayList<AuthData> getAllAuth() throws DataAccessException{
+        ArrayList<AuthData> allAuth = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT jsonAuthData FROM auth";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String json = rs.getString("jsonAuthData");
+                        AuthData authData = new Gson().fromJson(json, AuthData.class);
+                        allAuth.add(authData);
+                    }
+                    return allAuth;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+        }
     }
 
     @Override
