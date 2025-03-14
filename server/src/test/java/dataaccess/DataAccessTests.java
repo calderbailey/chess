@@ -130,11 +130,18 @@ public class DataAccessTests {
     @Order(9)
     @DisplayName("getGameList: Success")
     public void getGameListSuccess() throws Exception{
+
+        ArrayList<GameData> testList = new ArrayList<>();
+        testList.add(new GameData(1, null, null, "Game 1", new ChessGame()));
+        testList.add(new GameData(2, null, null, "Game 2", new ChessGame()));
+        testList.add(new GameData(3, null, null, "Game 3", new ChessGame()));
+
         GAME_DAO.createGame("Game 1");
         GAME_DAO.createGame("Game 2");
         GAME_DAO.createGame("Game 3");
         ArrayList<GameData> allGames = GAME_DAO.getGameList();
-        Assertions.assertEquals(3, allGames.size());
+
+        Assertions.assertEquals(testList, allGames);
     }
 
     @Test
@@ -159,32 +166,23 @@ public class DataAccessTests {
         Assertions.assertEquals(testGame, game);
     }
 
-//    @Test
-//    @Order(12)
-//    @DisplayName("JoinGame: Already Taken")
-//    public void joinGameAlreadyTaken() throws Exception{
-//        GAME_DAO.createGame("Game 1");
-//        GAME_DAO.updateGame("USER1", "WHITE", 1);
-//        JoinGameRequest joinReq = new JoinGameRequest("WHITE", 1, "USER2");
-//        DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-//            new GameService().joinGame(joinReq);
-//        });
-//        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
-//        Assertions.assertEquals(403, exception.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(13)
-//    @DisplayName("Clear: Success")
-//    public void clearSuccess() throws Exception{
-//        GAME_DAO.createGame("Game 1");
-//        USER_DAO.createUser(new UserData("Username", "Password", "Email"));
-//       AuthData authData = AUTH_DAO.createAuth("Username");
-//       String authToken = authData.authToken();
-//       new UserService().clear(new ClearRequest());
-//       Assertions.assertNull(GAME_DAO.getGame(1));
-//       Assertions.assertNull(USER_DAO.getUser("Username"));
-//       Assertions.assertNull(AUTH_DAO.getAuth(authToken));
-//    }
+    @Test
+    @Order(12)
+    @DisplayName("getGame: GameID Doesn't Exist")
+    public void getGameBadID() throws Exception{
+        GameData game = GAME_DAO.getGame(1);
+        Assertions.assertNull(game);
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("Clear: Success")
+    public void clearSuccess() throws Exception{
+        GAME_DAO.createGame("Game 1");
+        GAME_DAO.createGame("Game 2");
+        GAME_DAO.createGame("Game 3");
+        GAME_DAO.clear();
+        Assertions.assertEquals(0, GAME_DAO.getGameList().size());
+    }
 }
 
