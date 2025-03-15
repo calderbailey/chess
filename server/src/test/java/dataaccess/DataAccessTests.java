@@ -199,12 +199,12 @@ public class DataAccessTests {
     @Order(17)
     @DisplayName("createGameID: Success")
     public void createGameIDSuccess() throws Exception{
-        Integer gameID_1 = GAME_DAO.createGameID();
-        Integer gameID_2 = GAME_DAO.createGameID();
-        Integer gameID_3 = GAME_DAO.createGameID();
-        Assertions.assertEquals(1, gameID_1);
-        Assertions.assertEquals(2, gameID_2);
-        Assertions.assertEquals(3, gameID_3);
+        Integer gameID1 = GAME_DAO.createGameID();
+        Integer gameID2 = GAME_DAO.createGameID();
+        Integer gameID3 = GAME_DAO.createGameID();
+        Assertions.assertEquals(1, gameID1);
+        Assertions.assertEquals(2, gameID2);
+        Assertions.assertEquals(3, gameID3);
     }
 
     @Test

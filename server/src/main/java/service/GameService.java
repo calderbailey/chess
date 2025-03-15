@@ -4,7 +4,7 @@ import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import requestresult.*;
 
-public class GameService<gameDAO> extends Service{
+public class GameService extends Service{
 
     private static final GameDAOInterface GAME_DAO;
 
