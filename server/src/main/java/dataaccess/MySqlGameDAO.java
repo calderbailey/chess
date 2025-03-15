@@ -82,26 +82,33 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
 
     @Override
     public Integer createGameID() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement("SELECT gameID FROM nextGameID WHERE id = 1");
-             var rs = ps.executeQuery()) {
-            if (rs.next()) {
-                Integer gameID = rs.getInt("gameID");
-                var updateStatement = "UPDATE nextGameID SET gameID = ? WHERE id = 1";
-                var updatedGameID = gameID + 1;
+        try (var conn = DatabaseManager.getConnection()) {
+            // Retrieve the current gameID
+            Integer gameID;
+            {
+                String selectStatement = "SELECT gameID FROM nextGameID WHERE id = 1";
+                try (var ps = conn.prepareStatement(selectStatement);
+                     var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        gameID = rs.getInt("gameID");
+                    } else {
+                        throw new DataAccessException("No gameID found in nextGameID table.", 500);
+                    }
+                }
+            }
+            {
+                String updateStatement = "UPDATE nextGameID SET gameID = ? WHERE id = 1";
+                int updatedGameID = gameID + 1;
                 try (var updatedPS = conn.prepareStatement(updateStatement)) {
                     updatedPS.setInt(1, updatedGameID);
                     updatedPS.executeUpdate();
                 }
-                return gameID;
-            } else {
-                throw new DataAccessException("No gameID found in nextGameID table.", 500);
             }
+            return gameID;
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
         }
     }
-
 
     @Override
     public ArrayList<GameData> getGameList() throws DataAccessException{
