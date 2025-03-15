@@ -20,16 +20,18 @@ public class ServerFacade {
         return this.makeRequest("DELETE", path, null, null);
     }
 
-    public LoginResult login(LoginRequest request) {
-        return null;
+    public LoginResult login(LoginRequest request) throws DataAccessException {
+        var path = "/session";
+        return this.makeRequest("POST", path, request, LoginResult.class);
     }
 
     public LogoutResult logout(LogoutRequest request) {
         return null;
     }
 
-    public RegisterResult register(RegisterRequest request) {
-        return null;
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+        var path = "/user";
+        return this.makeRequest("POST", path, request, RegisterResult.class);
     }
 
     public CreateResult createGame(CreateRequest request) {
