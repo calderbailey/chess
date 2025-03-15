@@ -4,6 +4,8 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptionhandling.*;
 import model.GameData;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
@@ -80,28 +82,26 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
 
     @Override
     public Integer createGameID() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID FROM nextGameID WHERE id = 1";
-            try (var ps = conn.prepareStatement(statement)) {
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        Integer gameID = rs.getInt("gameID");
-                        var updateStatement = "UPDATE nextGameID SET gameID = ? WHERE id = 1";
-                        var updatedGameID = gameID + 1;
-                        try (var updatedPS = conn.prepareStatement(updateStatement)) {
-                            updatedPS.setInt(1, updatedGameID);
-                            updatedPS.executeUpdate();
-                        }
-                        return gameID;
-                    } else {
-                        throw new DataAccessException("No gameID found in nextGameID table.", 500);
-                    }
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("SELECT gameID FROM nextGameID WHERE id = 1");
+             var rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Integer gameID = rs.getInt("gameID");
+                var updateStatement = "UPDATE nextGameID SET gameID = ? WHERE id = 1";
+                var updatedGameID = gameID + 1;
+                try (var updatedPS = conn.prepareStatement(updateStatement)) {
+                    updatedPS.setInt(1, updatedGameID);
+                    updatedPS.executeUpdate();
                 }
+                return gameID;
+            } else {
+                throw new DataAccessException("No gameID found in nextGameID table.", 500);
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
         }
     }
+
 
     @Override
     public ArrayList<GameData> getGameList() throws DataAccessException{

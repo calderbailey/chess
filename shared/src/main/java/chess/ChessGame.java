@@ -223,7 +223,9 @@ public class ChessGame implements Cloneable{
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(gameBoard, chessGame.gameBoard) && getTeamTurn() == chessGame.getTeamTurn() && Objects.equals(allPositions, chessGame.allPositions);
+        return Objects.equals(gameBoard, chessGame.gameBoard) &&
+                getTeamTurn() == chessGame.getTeamTurn() &&
+                Objects.equals(allPositions, chessGame.allPositions);
     }
 }
 

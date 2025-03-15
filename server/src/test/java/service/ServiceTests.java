@@ -6,12 +6,12 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import requestresult.*;
-import test.test;
+import test.Test;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServiceTests extends test{
+public class ServiceTests extends Test {
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(1)
     @DisplayName("Register: Success")
     public void registerSuccess() throws DataAccessException{
@@ -24,7 +24,7 @@ public class ServiceTests extends test{
                 "Registration was not correctly added to the database");
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(2)
     @DisplayName("Register: User Taken")
     public void registerUserTaken() throws DataAccessException {
@@ -37,7 +37,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(403, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(3)
     @DisplayName("Login: Success")
     public void loginSuccess() throws Exception{
@@ -49,7 +49,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals("Username", authData.username());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(4)
     @DisplayName("Login: Unauthorized")
     public void loginUnauthorized() {
@@ -61,7 +61,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(5)
     @DisplayName("Logout: Success")
     public void logoutSuccess() throws Exception{
@@ -72,7 +72,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(new LogoutResult(), logoutRes);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(6)
     @DisplayName("Logout: Unauthorized")
     public void logoutUnauthorized() {
@@ -84,7 +84,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(7)
     @DisplayName("CreateGame: Success")
     public void createGameSuccess() throws Exception{
@@ -92,7 +92,7 @@ public class ServiceTests extends test{
         Assertions.assertNotNull(createResult);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(8)
     @DisplayName("CreateGame: Game Name Taken")
     public void createGameNameTaken() throws DataAccessException{
@@ -104,7 +104,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(500, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(9)
     @DisplayName("ListGames: Success")
     public void listGamesSuccess() throws Exception{
@@ -115,7 +115,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(3, listRes.games().size());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(10)
     @DisplayName("ListGames: Unauthorized")
     public void listGamesUnauthorized() throws DataAccessException{
@@ -127,7 +127,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(11)
     @DisplayName("JoinGame: Success")
     public void joinGameSuccess() throws Exception{
@@ -138,7 +138,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals("USER", gameData.whiteUsername());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(12)
     @DisplayName("JoinGame: Already Taken")
     public void joinGameAlreadyTaken() throws Exception{
@@ -152,7 +152,7 @@ public class ServiceTests extends test{
         Assertions.assertEquals(403, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(13)
     @DisplayName("Clear: Success")
     public void clearSuccess() throws Exception{

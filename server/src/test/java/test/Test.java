@@ -4,7 +4,7 @@ import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import org.junit.jupiter.api.BeforeEach;
 
-public abstract class test {
+public abstract class Test {
     protected static final UserDAOInterface USER_DAO;
     protected static final AuthDAOInterface AUTH_DAO;
     protected static final GameDAOInterface GAME_DAO;

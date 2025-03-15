@@ -7,21 +7,21 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import test.test;
+import test.Test;
 import java.util.ArrayList;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DataAccessTests extends test {
+public class DataAccessTests extends Test {
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(1)
     @DisplayName("createAuth: Success")
     public void createAuthSuccess() throws DataAccessException{
         Assertions.assertNotNull(AUTH_DAO.createAuth("USER"));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(2)
     @DisplayName("getAuth: Success")
     public void getAuthSuccess() throws DataAccessException{
@@ -30,14 +30,14 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(originalAuthData, newAuthData);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(3)
     @DisplayName("getAuth: Authorization Doesn't Exist")
     public void getAuthBadRequest() throws DataAccessException{
         Assertions.assertNull(AUTH_DAO.getAuth("WRONG TOKEN"));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(4)
     @DisplayName("authDAOClear: Success")
     public void authDAOClearSuccess() throws DataAccessException{
@@ -46,7 +46,7 @@ public class DataAccessTests extends test {
         Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(5)
     @DisplayName("delAuth: Success")
     public void delAuthSuccess() throws DataAccessException{
@@ -55,7 +55,7 @@ public class DataAccessTests extends test {
         Assertions.assertNull(AUTH_DAO.getAuth(authData.authToken()));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(6)
     @DisplayName("getUser: Success")
     public void getUserSuccess() throws DataAccessException{
@@ -66,21 +66,21 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(testUserData.email(), userData.email());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(7)
     @DisplayName("getUser: Does Not Exist")
     public void getUserBadRequest() throws DataAccessException{
         Assertions.assertNull(USER_DAO.getUser("WRONG USERNAME"));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(8)
     @DisplayName("createUser: Success")
     public void createUserSuccess() throws DataAccessException{
         getUserSuccess();
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(9)
     @DisplayName("userDAOClear: Success")
     public void userDAOClearSuccess() throws Exception{
@@ -90,7 +90,7 @@ public class DataAccessTests extends test {
         Assertions.assertNull(USER_DAO.getUser("User 1"));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(10)
     @DisplayName("createGame: Success")
     public void createGameSuccess() throws Exception{
@@ -98,7 +98,7 @@ public class DataAccessTests extends test {
         Assertions.assertNotNull(createResult);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(11)
     @DisplayName("createGame: Game Name Taken")
     public void createGameNameTaken() throws DataAccessException{
@@ -110,7 +110,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(500, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(12)
     @DisplayName("getGameList: Success")
     public void getGameListSuccess() throws Exception{
@@ -128,7 +128,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(testList, allGames);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(13)
     @DisplayName("getGameList: Unauthorized")
     public void getGameListUnauthorized() throws DataAccessException{
@@ -140,7 +140,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(14)
     @DisplayName("getGame: Success")
     public void getGameSuccess() throws Exception{
@@ -150,7 +150,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(testGame, game);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(15)
     @DisplayName("getGame: GameID Doesn't Exist")
     public void getGameBadID() throws Exception{
@@ -158,7 +158,7 @@ public class DataAccessTests extends test {
         Assertions.assertNull(game);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(16)
     @DisplayName("gameDAOClear: Success")
     public void gameDAOClearSuccess() throws Exception{
@@ -168,7 +168,7 @@ public class DataAccessTests extends test {
         GAME_DAO.clear();
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(17)
     @DisplayName("createGameID: Success")
     public void createGameIDSuccess() throws Exception{
@@ -180,7 +180,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(3, gameID3);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(18)
     @DisplayName("updateGame: Success")
     public void updateGameSuccess() throws Exception{
@@ -191,7 +191,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(testGame, game);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(19)
     @DisplayName("updateGame: Bad Request")
     public void updateGameBadRequest() throws Exception{
@@ -203,7 +203,7 @@ public class DataAccessTests extends test {
         Assertions.assertEquals(400, exception.getStatusCode());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(20)
     @DisplayName("colorAvailable: Success")
     public void colorAvailableSuccess() throws Exception{
@@ -212,7 +212,7 @@ public class DataAccessTests extends test {
         Assertions.assertDoesNotThrow(() -> GAME_DAO.colorAvailable("WHITE", 1));
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     @Order(21)
     @DisplayName("colorAvailable: Unavailable")
     public void colorAvailableUnavailable() throws Exception{
