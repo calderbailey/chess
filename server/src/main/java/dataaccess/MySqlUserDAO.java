@@ -16,7 +16,7 @@ public class MySqlUserDAO extends MySqlDAO implements UserDAOInterface{
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         String updateStatement = "INSERT INTO user (username, jsonUserData) VALUES (?, ?)";
-        String json = new Gson().toJson(userData);
+        String json = new Gson().toJson(userDataEncrypter(userData));
         executeUpdate(updateStatement, userData.username(), json);
     }
 

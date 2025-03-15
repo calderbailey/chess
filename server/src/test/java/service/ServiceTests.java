@@ -40,7 +40,9 @@ public class ServiceTests {
         RegisterRequest regReq = new RegisterRequest("Username", "Password", "EMAIL@GMAIL.COM");
         new UserService().register(regReq);
         UserData userData = USER_DAO.getUser("Username");
-        Assertions.assertEquals(new UserData("Username", "Password", "EMAIL@GMAIL.COM"), userData,
+        Assertions.assertEquals("Username", userData.username(),
+                "Registration was not correctly added to the database");
+        Assertions.assertEquals("EMAIL@GMAIL.COM", userData.email(),
                 "Registration was not correctly added to the database");
     }
 

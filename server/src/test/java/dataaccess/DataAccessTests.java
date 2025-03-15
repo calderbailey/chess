@@ -85,7 +85,8 @@ public class DataAccessTests {
         UserData testUserData = new UserData("User", "Password", "email");
         USER_DAO.createUser(testUserData);
         UserData userData = USER_DAO.getUser(testUserData.username());
-        Assertions.assertEquals(testUserData, userData);
+        Assertions.assertEquals(testUserData.username(), userData.username());
+        Assertions.assertEquals(testUserData.email(), userData.email());
     }
 
     @Test
@@ -102,7 +103,8 @@ public class DataAccessTests {
         UserData testUserData = new UserData("User", "Password", "email");
         USER_DAO.createUser(testUserData);
         UserData userData = USER_DAO.getUser(testUserData.username());
-        Assertions.assertEquals(testUserData, userData);
+        Assertions.assertEquals(testUserData.username(), userData.username());
+        Assertions.assertEquals(testUserData.email(), userData.email());
     }
 
     @Test

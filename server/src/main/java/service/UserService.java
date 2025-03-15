@@ -4,6 +4,7 @@ import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import requestresult.*;
 
 public class UserService extends Service{
@@ -54,12 +55,17 @@ public class UserService extends Service{
             throw new DataAccessException("Error: bad request", 400);
         }
         UserData usernameResult = USER_DAO.getUser(username);
-        if (usernameResult == null || !usernameResult.password().equals(password)) {
+        if (usernameResult == null || !verifyPassword(usernameResult, password)) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
         AuthData authData = AUTH_DAO.createAuth(username);
         String authToken = authData.authToken();
         return new LoginResult(usernameResult.username(), authToken);
+    }
+
+    private boolean verifyPassword(UserData userData, String password) {
+        var hashedPassword = userData.password();
+        return BCrypt.checkpw(password, hashedPassword);
     }
 
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException{
