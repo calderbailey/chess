@@ -7,35 +7,12 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import requestresult.*;
-import service.GameService;
-import service.UserService;
-
+import test.test;
 import java.util.ArrayList;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DataAccessTests {
-    private static final UserDAOInterface USER_DAO;
-    private static final AuthDAOInterface AUTH_DAO;
-    private static final GameDAOInterface GAME_DAO;
-
-    static {
-        try {
-            GAME_DAO = new MySqlGameDAO();
-            AUTH_DAO = new MySqlAuthDAO();
-            USER_DAO = new MySqlUserDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @BeforeEach
-    public void setup() throws DataAccessException{
-        USER_DAO.clear();
-        AUTH_DAO.clear();
-        GAME_DAO.clear();
-    }
+public class DataAccessTests extends test {
 
     @Test
     @Order(1)
@@ -100,11 +77,7 @@ public class DataAccessTests {
     @Order(8)
     @DisplayName("createUser: Success")
     public void createUserSuccess() throws DataAccessException{
-        UserData testUserData = new UserData("User", "Password", "email");
-        USER_DAO.createUser(testUserData);
-        UserData userData = USER_DAO.getUser(testUserData.username());
-        Assertions.assertEquals(testUserData.username(), userData.username());
-        Assertions.assertEquals(testUserData.email(), userData.email());
+        getUserSuccess();
     }
 
     @Test

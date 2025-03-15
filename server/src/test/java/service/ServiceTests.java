@@ -1,6 +1,4 @@
 package service;
-
-import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import handlers.CreateGameHandler;
 import model.AuthData;
@@ -8,30 +6,10 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import requestresult.*;
-
+import test.test;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServiceTests {
-    private static final UserDAOInterface USER_DAO;
-    private static final AuthDAOInterface AUTH_DAO;
-    private static final GameDAOInterface GAME_DAO;
-
-    static {
-        try {
-            GAME_DAO = new MySqlGameDAO();
-            AUTH_DAO = new MySqlAuthDAO();
-            USER_DAO = new MySqlUserDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @BeforeEach
-    public void setup() throws DataAccessException{
-        USER_DAO.clear();
-        AUTH_DAO.clear();
-        GAME_DAO.clear();
-    }
+public class ServiceTests extends test{
 
     @Test
     @Order(1)
