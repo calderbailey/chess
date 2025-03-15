@@ -11,23 +11,17 @@ import static service.Service.DATABASE_METHOD;
 
 public abstract class Handler {
 
-    private final static UserDAOInterface USER_DAO;
     private final static AuthDAOInterface AUTH_DAO;
-    private final static GameDAOInterface GAME_DAO;
 
     static {
         if ("MySql".equals(DATABASE_METHOD)) {
             try {
-                USER_DAO = new MySqlUserDAO();
                 AUTH_DAO = new MySqlAuthDAO();
-                GAME_DAO = new MySqlGameDAO();
             } catch (DataAccessException e) {
                 throw new RuntimeException(e);
             }
         } else {
-            USER_DAO = new MemoryUserDAO();
             AUTH_DAO = new MemoryAuthDAO();
-            GAME_DAO = new MemoryGameDAO();
         }
     }
 
