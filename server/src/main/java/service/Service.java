@@ -4,7 +4,7 @@ import java.util.Properties;
 
 public abstract class Service {
 
-    protected static final String DATABASE_METHOD;
+    public static final String DATABASE_METHOD;
 
     static {
         try {

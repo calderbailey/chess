@@ -16,9 +16,9 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
-        String updateStatement = "INSERT INTO auth (username, jsonAuthData) VALUES (?, ?)";
         AuthData authData = new AuthData(generateToken(), username);
         String json = new Gson().toJson(authData);
+        String updateStatement = "INSERT INTO auth (username, jsonAuthData) VALUES (?, ?)";
         executeUpdate(updateStatement, username, json);
         return authData;
     }
@@ -40,7 +40,7 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
             String statement = "SELECT jsonAuthData FROM auth";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
+                    while (rs.next()) {
                         String json = rs.getString("jsonAuthData");
                         AuthData authData = new Gson().fromJson(json, AuthData.class);
                         allAuth.add(authData);
@@ -56,10 +56,12 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAOInterface {
     @Override
     public void delAuth(String authToken) throws DataAccessException {
         AuthData authData = getAuth(authToken);
+        if (authData == null) {throw new DataAccessException("Error: unauthorized", 401);
+        }
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "DELETE FROM auth WHERE username = ?";
+            String statement = "DELETE FROM auth WHERE jsonAuthData = ?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, authData.username());
+                ps.setString(1, new Gson().toJson(authData));
                 ps.executeUpdate();
             }
         } catch (Exception e) {

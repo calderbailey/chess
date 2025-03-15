@@ -217,7 +217,6 @@ public class StandardAPITests {
         //try join as white
         TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID());
         TestResult joinResult = serverFacade.joinPlayer(joinRequest, existingAuth + "bad stuff");
-
         //check
         assertHttpUnauthorized(joinResult);
     }

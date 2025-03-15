@@ -12,9 +12,19 @@ import requestresult.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceTests {
-    private static final UserDAOInterface USER_DAO = new MemoryUserDAO();
-    private static final AuthDAOInterface AUTH_DAO = new MemoryAuthDAO();
-    private static final GameDAOInterface GAME_DAO = new MemoryGameDAO();
+    private static final UserDAOInterface USER_DAO;
+    private static final AuthDAOInterface AUTH_DAO;
+    private static final GameDAOInterface GAME_DAO;
+
+    static {
+        try {
+            GAME_DAO = new MySqlGameDAO();
+            AUTH_DAO = new MySqlAuthDAO();
+            USER_DAO = new MySqlUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @BeforeEach
     public void setup() throws DataAccessException{

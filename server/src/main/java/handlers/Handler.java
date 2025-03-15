@@ -2,14 +2,36 @@ package handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dataaccess.AuthDAOInterface;
-import dataaccess.MemoryAuthDAO;
+import dataaccess.*;
 import exceptionhandling.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import spark.Request;
+import static service.Service.DATABASE_METHOD;
 
 public abstract class Handler {
+
+    private final static UserDAOInterface USER_DAO;
+    private final static AuthDAOInterface AUTH_DAO;
+    private final static GameDAOInterface GAME_DAO;
+
+    static {
+        if ("MySql".equals(DATABASE_METHOD)) {
+            try {
+                USER_DAO = new MySqlUserDAO();
+                AUTH_DAO = new MySqlAuthDAO();
+                GAME_DAO = new MySqlGameDAO();
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            USER_DAO = new MemoryUserDAO();
+            AUTH_DAO = new MemoryAuthDAO();
+            GAME_DAO = new MemoryGameDAO();
+        }
+    }
+
+
     protected final Gson gson = new GsonBuilder()
             .registerTypeAdapter(GameData.class, new CustomGameDataSerializer())
             .create();
@@ -27,15 +49,13 @@ public abstract class Handler {
     }
 
     public void checkAuth(String authToken) throws DataAccessException {
-        AuthDAOInterface authDAO = new MemoryAuthDAO();
-        if (authDAO.getAuth(authToken) == null) {
+        if (AUTH_DAO.getAuth(authToken) == null) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
     }
 
     protected String getUsername(String authToken) throws DataAccessException {
-        AuthDAOInterface authDAO = new MemoryAuthDAO();
-        AuthData authData = authDAO.getAuth(authToken);
+        AuthData authData = AUTH_DAO.getAuth(authToken);
         return authData.username();
     }
 }

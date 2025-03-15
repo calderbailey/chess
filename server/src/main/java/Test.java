@@ -33,5 +33,7 @@ public class Test {
         for (GameData gameData1 : gameList) {
             System.out.printf(String.valueOf(gameData1) + "\n\n");
         }
+        MySqlUserDAO suser = new MySqlUserDAO();
+        suser.clear();
     }
 }
