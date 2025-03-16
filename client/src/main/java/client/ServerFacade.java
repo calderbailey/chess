@@ -40,12 +40,14 @@ public class ServerFacade {
         return this.makeRequest("POST", path, request, CreateResult.class, authToken);
     }
 
-    public ListGamesResult listGames(ListGamesRequest request) {
-        return null;
+    public ListGamesResult listGames(ListGamesRequest request, String authToken) throws DataAccessException {
+        var path = "/game";
+        return this.makeRequest("GET", path, request, ListGamesResult.class, authToken);
     }
 
-    public JoinGameResult joinGame(JoinGameRequest request) {
-        return null;
+    public JoinGameResult joinGame(JoinGameRequest request, String authToken) throws DataAccessException {
+        var path = "/game";
+        return this.makeRequest("PUT", path, request, JoinGameResult.class, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
@@ -53,9 +55,13 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
-            http.setDoOutput(true);
+            if (!method.equals("GET")){
+                http.setDoOutput(true);
+            }
             http.setRequestProperty("Authorization", authToken);
-            writeBody(request, http);
+            if (!method.equals("GET")){
+                writeBody(request, http);
+            }
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);

@@ -9,12 +9,5 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-        ServerFacade serverFacade = new ServerFacade(serverUrl);
-        serverFacade.delete(new ClearRequest());
-        RegisterResult register = serverFacade.register(new RegisterRequest("Bailey", "PAssWord", "Bailey@gmail.com"));
-        String regToken = register.authToken();
-        CreateRequest createRequest = new CreateRequest("NEW GAME");
-        System.out.printf(serverFacade.createGame(createRequest, regToken).toString() + "\n");
-        System.out.printf(serverFacade.logout(new LogoutRequest(null), regToken).toString());
     }
 }
