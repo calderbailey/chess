@@ -1,9 +1,7 @@
 import chess.*;
 import client.ServerFacade;
 import exceptionhandling.DataAccessException;
-import requestresult.ClearRequest;
-import requestresult.LoginRequest;
-import requestresult.RegisterRequest;
+import requestresult.*;
 
 public class Main {
     public static void main(String[] args) throws DataAccessException {
@@ -12,7 +10,11 @@ public class Main {
             serverUrl = args[0];
         }
         ServerFacade serverFacade = new ServerFacade(serverUrl);
-        System.out.printf(serverFacade.register(new RegisterRequest("Bailey", "PAssWord", "Bailey@gmail.com")).toString() + "\n");
-        System.out.printf(serverFacade.login(new LoginRequest("Bailey", "PAssWord")).toString());
+        serverFacade.delete(new ClearRequest());
+        RegisterResult register = serverFacade.register(new RegisterRequest("Bailey", "PAssWord", "Bailey@gmail.com"));
+        String regToken = register.authToken();
+        CreateRequest createRequest = new CreateRequest("NEW GAME");
+        System.out.printf(serverFacade.createGame(createRequest, regToken).toString() + "\n");
+        System.out.printf(serverFacade.logout(new LogoutRequest(null), regToken).toString());
     }
 }
