@@ -7,10 +7,11 @@ import static ui.EscapeSequences.*;
 
 public class PreLoginRepl {
     private final ChessClient client;
+    private final String serverUrl;
     private boolean proceed = true;
 
-
     public PreLoginRepl(String serverUrl) {
+        this.serverUrl = serverUrl;
         client = new ChessClient(serverUrl);
     }
 
@@ -23,8 +24,7 @@ public class PreLoginRepl {
             String[] userInput = parseInput(scanner.nextLine());
             try {
                 checkInput(userInput);
-                result = eval(userInput);
-                System.out.print(result + RESET_TEXT_COLOR  + "\n");
+                eval(userInput);
             } catch (Throwable e) {
                 var msg = e.getMessage();
                 System.out.printf("\n" + SET_TEXT_ITALIC + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n\n");
@@ -34,18 +34,23 @@ public class PreLoginRepl {
         System.exit(1);
     }
 
-    private String eval(String[] userInput) throws DataAccessException {
+    private void eval(String[] userInput) throws DataAccessException {
         switch (userInput[0].toLowerCase()) {
             case "register":
-                return client.Register(userInput);
+                System.out.printf(client.Register(userInput) + "\n");
+                new PostLoginRepl(serverUrl).run();
+                break;
             case "login":
-                return client.Login(userInput);
+                System.out.printf(client.Login(userInput) + "\n");
+                new PostLoginRepl(serverUrl).run();
+                break;
             case "help":
-                return help();
+                System.out.printf(help());
+                break;
             case "quit":
-                return quit();
+                System.out.printf(quit());
+                break;
         }
-        return null;
     }
 
     private void printPrompt() {
