@@ -1,7 +1,7 @@
-package client;
+package ui;
+
 import exceptionhandling.DataAccessException;
 import requestresult.*;
-
 import com.google.gson.Gson;
 import java.io.*;
 import java.net.*;
@@ -32,7 +32,7 @@ public class ServerFacade {
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
         var path = "/user";
-        return this.makeRequest("POST", path, request, RegisterResult.class, null);
+            return this.makeRequest("POST", path, request, RegisterResult.class, null);
     }
 
     public CreateResult createGame(CreateRequest request, String authToken) throws DataAccessException {

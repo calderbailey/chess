@@ -1,7 +1,5 @@
-import chess.*;
-import client.ServerFacade;
 import exceptionhandling.DataAccessException;
-import requestresult.*;
+import ui.PreLoginRepl;
 
 public class Main {
     public static void main(String[] args) throws DataAccessException {
@@ -9,5 +7,7 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
+        PreLoginRepl repl = new PreLoginRepl(serverUrl);
+        repl.run();
     }
 }
