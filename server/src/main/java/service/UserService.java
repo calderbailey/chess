@@ -37,8 +37,6 @@ public class UserService extends Service{
             throw new DataAccessException("Error: bad request", 400);
         }
         if (USER_DAO.getUser(username) != null) {
-            String output = USER_DAO.getUser(username).toString();
-            System.out.printf(output);
             throw new DataAccessException("Error: already taken", 403);
         }
         USER_DAO.createUser(new UserData(username, password, email));

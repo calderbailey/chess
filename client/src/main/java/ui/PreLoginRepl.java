@@ -65,7 +65,7 @@ public class PreLoginRepl {
             default -> throw new IllegalArgumentException("Unknown command: " + arguments[0]);
         };
         if (actualArgs != expectedArgs) {
-            throw new IllegalArgumentException("Invalid Number of Arguments.");
+            throw new IllegalArgumentException("ERROR: Invalid Number of Arguments.");
         }
     }
 

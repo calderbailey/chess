@@ -106,7 +106,7 @@ public class DataAccessTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             GAME_DAO.createGame("Game 1");
         });
-        Assertions.assertEquals("Error: game name taken", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: game name taken", exception.getMessage());
         Assertions.assertEquals(500, exception.getStatusCode());
     }
 
@@ -136,7 +136,7 @@ public class DataAccessTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new CreateGameHandler().checkAuth("wrong");
         });
-        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
@@ -199,7 +199,7 @@ public class DataAccessTests extends Test {
         GAME_DAO.createGame("Game 1");
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             GAME_DAO.updateGame("USER", "black", 1);        });
-        Assertions.assertEquals("Error: bad request", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: bad request", exception.getMessage());
         Assertions.assertEquals(400, exception.getStatusCode());
     }
 
@@ -221,7 +221,7 @@ public class DataAccessTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             GAME_DAO.colorAvailable("BLACK", 1);
         });
-        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
         Assertions.assertEquals(403, exception.getStatusCode());
     }
 }

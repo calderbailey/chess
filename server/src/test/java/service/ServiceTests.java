@@ -33,7 +33,7 @@ public class ServiceTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new UserService().register(regReq);
         });
-        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
         Assertions.assertEquals(403, exception.getStatusCode());
     }
 
@@ -57,7 +57,7 @@ public class ServiceTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new UserService().login(logReq);
         });
-        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
@@ -80,7 +80,7 @@ public class ServiceTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new UserService().logout(logReq);
         });
-        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
@@ -100,7 +100,7 @@ public class ServiceTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new GameService().createGame(new CreateRequest("Game 1"));
         });
-        Assertions.assertEquals("Error: game name taken", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: game name taken", exception.getMessage());
         Assertions.assertEquals(500, exception.getStatusCode());
     }
 
@@ -123,7 +123,7 @@ public class ServiceTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new CreateGameHandler().checkAuth("wrong");
         });
-        Assertions.assertEquals("Error: unauthorized", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: unauthorized", exception.getMessage());
         Assertions.assertEquals(401, exception.getStatusCode());
     }
 
@@ -148,7 +148,7 @@ public class ServiceTests extends Test {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             new GameService().joinGame(joinReq);
         });
-        Assertions.assertEquals("Error: already taken", exception.getDefaultMessage());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
         Assertions.assertEquals(403, exception.getStatusCode());
     }
 

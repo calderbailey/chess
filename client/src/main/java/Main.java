@@ -1,5 +1,8 @@
 import exceptionhandling.DataAccessException;
+import requestresult.RegisterRequest;
 import ui.PreLoginRepl;
+import ui.ServerFacade;
+import ui.*;
 
 public class Main {
     public static void main(String[] args) throws DataAccessException {
@@ -7,7 +10,6 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-        PreLoginRepl repl = new PreLoginRepl(serverUrl);
-        repl.run();
+        new PreLoginRepl(serverUrl).run();
     }
 }

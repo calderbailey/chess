@@ -32,7 +32,7 @@ public class ServerFacade {
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {
         var path = "/user";
-            return this.makeRequest("POST", path, request, RegisterResult.class, null);
+        return this.makeRequest("POST", path, request, RegisterResult.class, null);
     }
 
     public CreateResult createGame(CreateRequest request, String authToken) throws DataAccessException {
@@ -91,7 +91,6 @@ public class ServerFacade {
                     throw DataAccessException.fromJson(respErr);
                 }
             }
-
             throw new DataAccessException("other failure: " + status, status);
         }
     }

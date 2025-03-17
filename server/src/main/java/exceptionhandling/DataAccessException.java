@@ -11,15 +11,10 @@ import java.util.Map;
  * Indicates there was an error connecting to the database
  */
 public class DataAccessException extends Exception{
-    private final String defaultMessage;
     private final Integer statusCode;
-    public DataAccessException(String defaultMessage, Integer statusCode) {
-        this.defaultMessage = defaultMessage;
+    public DataAccessException(String message, Integer statusCode) {
+        super(message);
         this.statusCode = statusCode;
-    }
-
-    public String getDefaultMessage(){
-        return defaultMessage;
     }
 
     public Integer getStatusCode(){
@@ -27,7 +22,7 @@ public class DataAccessException extends Exception{
     }
 
     public String toJson() {
-        return new Gson().toJson(Map.of("message", getDefaultMessage()));
+        return new Gson().toJson(Map.of("status", getStatusCode(), "message", getMessage()));
     }
 
     public static DataAccessException fromJson(InputStream stream) {
@@ -36,6 +31,4 @@ public class DataAccessException extends Exception{
         String message = map.get("message").toString();
         return new DataAccessException(message, status);
     }
-
-
 }
