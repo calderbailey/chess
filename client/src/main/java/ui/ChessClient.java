@@ -1,11 +1,10 @@
 package ui;
 
 import exceptionhandling.DataAccessException;
-import requestresult.LoginRequest;
-import requestresult.RegisterRequest;
+import requestresult.*;
 
 public class ChessClient {
-
+    private static String authToken;
     private final String serverUrl;
     public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -17,7 +16,8 @@ public class ChessClient {
         String email = userInput[3];
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
-        serverFacade.register(registerRequest);
+        RegisterResult regResult = serverFacade.register(registerRequest);
+        authToken = regResult.authToken();
         return "Logged in as " + username;
     }
 
@@ -26,7 +26,16 @@ public class ChessClient {
         String password = userInput[2];
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         LoginRequest loginRequest = new LoginRequest(username, password);
-        serverFacade.login(loginRequest);
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        authToken = loginResult.authToken();
         return "Logged in as " + username;
+    }
+
+    public String Create(String[] userInput) throws DataAccessException {
+        String gameName = userInput[1];
+        ServerFacade serverFacade = new ServerFacade(serverUrl);
+        CreateRequest createRequest = new CreateRequest(gameName);
+        serverFacade.createGame(createRequest, authToken);
+        return gameName + " has been created";
     }
 }
