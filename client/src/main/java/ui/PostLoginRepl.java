@@ -41,7 +41,7 @@ public class PostLoginRepl {
                 System.out.printf(client.Create(userInput) + "\n");
                 break;
             case "list":
-                System.out.print("List Called \n");
+                System.out.printf(client.List() + "\n");
                 break;
             case "join":
                 System.out.print("Join Called \n");
@@ -72,7 +72,8 @@ public class PostLoginRepl {
             default -> throw new IllegalArgumentException("Unknown command: " + arguments[0]);
         };
         if (actualArgs != expectedArgs) {
-            throw new IllegalArgumentException("ERROR: Invalid Number of Arguments.");
+            throw new IllegalArgumentException("ERROR: Invalid Number of Arguments --" +
+                                               "Note: no spaces are allowed within arguments");
         }
     }
 
