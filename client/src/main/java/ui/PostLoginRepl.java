@@ -44,7 +44,7 @@ public class PostLoginRepl {
                 System.out.printf(client.List() + "\n");
                 break;
             case "join":
-                System.out.print("Join Called \n");
+                System.out.printf(client.join(userInput) + "\n");
                 break;
             case "observe":
                 System.out.print("Observe Called \n");

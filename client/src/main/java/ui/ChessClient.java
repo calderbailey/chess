@@ -1,9 +1,10 @@
 package ui;
 
+import chess.ChessGame;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import requestresult.*;
-
+import chess.ChessGame.TeamColor;
 import java.util.HashMap;
 
 public class ChessClient {
@@ -45,6 +46,15 @@ public class ChessClient {
     }
 
     public String List() throws DataAccessException {
+        updateGameList();
+        if (gameList.keySet().isEmpty() || gameList.keySet() == null) {
+            return "No active games\n";
+        } else {
+            return mapToString(gameList).toString();
+        }
+    }
+
+    private void updateGameList() throws DataAccessException {
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         ListGamesResult listResult = serverFacade.listGames(new ListGamesRequest(), authToken);
         if (gameList != null) {
@@ -55,24 +65,44 @@ public class ChessClient {
             gameList.put(keyNum, game);
             keyNum ++;
         }
-        if (gameList.keySet().isEmpty() || gameList.keySet() == null) {
-            return "No active games\n";
-        } else {
-            return mapToString(gameList).toString();
-        }
     }
 
     private StringBuilder mapToString(HashMap<Integer, GameData> gameList) {
         StringBuilder fullString = new StringBuilder();
-        for (Object key : gameList.keySet()) {
-            String gameName = gameList.get(key).gameName();
-            String whiteUser = gameList.get(key).whiteUsername();
-            String blackUser = gameList.get(key).blackUsername();
-            String gameString = key + ". " + gameName + "\n" +
-                                "   White: " + whiteUser + "\n" +
-                                "   Black: " + blackUser + "\n";
-            fullString.append(gameString);
+        for (Integer key : gameList.keySet()) {
+            fullString.append(gameToString(key));
         }
         return fullString;
+    }
+
+    private String gameToString(Integer key) {
+        String gameName = gameList.get(key).gameName();
+        String whiteUser = gameList.get(key).whiteUsername();
+        String blackUser = gameList.get(key).blackUsername();
+        return key + ". " + gameName + "\n" +
+                "   White: " + whiteUser + "\n" +
+                "   Black: " + blackUser + "\n";
+    }
+
+    public String join(String[] userInput) throws DataAccessException {
+        Integer gameID;
+        String gameName;
+        Integer gameNum;
+        try {
+            gameNum = Integer.parseInt(userInput[1]);
+            gameID = gameList.get(gameNum).gameID();
+            gameName = gameList.get(gameNum).gameName();
+        } catch (Exception e) {
+            throw new DataAccessException("Invalid game ID", 500);
+        }
+        String teamColor = userInput[2].toUpperCase();
+        if (!(teamColor.equals("BLACK") | teamColor.equals("WHITE"))) {
+            throw new DataAccessException("Invalid player color", 500);
+        }
+        JoinGameRequest joinRequest = new JoinGameRequest(teamColor, gameID);
+        ServerFacade serverFacade = new ServerFacade(serverUrl);
+        JoinGameResult joinResult = serverFacade.joinGame(joinRequest, authToken);
+        updateGameList();
+        return gameToString(gameNum);
     }
 }

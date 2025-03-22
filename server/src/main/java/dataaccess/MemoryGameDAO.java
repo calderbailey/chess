@@ -67,6 +67,7 @@ public class MemoryGameDAO implements GameDAOInterface{
     @Override
     public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException{
         colorAvailable(playerColor, gameID);
+        isAlreadyPlaying(username, gameID);
         GameData game = GAME_MAP.get(gameID);
         GameData updatedGame;
         if (playerColor.equals("WHITE")) {
@@ -77,5 +78,4 @@ public class MemoryGameDAO implements GameDAOInterface{
         GAME_MAP.remove(gameID);
         GAME_MAP.put(gameID, updatedGame);
     }
-
 }

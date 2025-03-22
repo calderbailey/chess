@@ -148,6 +148,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     @Override
     public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException {
         colorAvailable(playerColor, gameID);
+        isAlreadyPlaying(username, gameID);
         GameData game = getGame(gameID);
         GameData updatedGame;
         if (playerColor.equals("WHITE")) {

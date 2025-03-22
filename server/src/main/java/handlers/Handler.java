@@ -49,7 +49,7 @@ public abstract class Handler {
     }
 
     protected String getUsername(String authToken) throws DataAccessException {
-        AuthData authData = AUTH_DAO.getAuth(authToken);
-        return authData.username();
+        checkAuth(authToken);
+        return AUTH_DAO.getAuth(authToken).username();
     }
 }
