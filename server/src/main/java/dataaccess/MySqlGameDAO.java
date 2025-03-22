@@ -43,7 +43,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
             String statement = "SELECT jsonGameData FROM games";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
+                    while (rs.next()) {
                         String json = rs.getString("jsonGameData");
                         GameData gameData = new Gson().fromJson(json, GameData.class);
                         allGames.add(gameData);
