@@ -45,12 +45,14 @@ public class PostLoginRepl {
                 break;
             case "join":
                 System.out.printf(client.join(userInput) + "\n");
+                new GamePlayRepl(serverUrl).run();
                 break;
             case "observe":
                 System.out.print("Observe Called \n");
                 break;
             case "logout":
-                System.out.print("Logout Called \n");
+                System.out.printf("\n");
+                new PreLoginRepl(serverUrl).run();
                 break;
             case "help":
                 System.out.printf(help());

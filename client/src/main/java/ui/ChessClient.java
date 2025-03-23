@@ -86,12 +86,10 @@ public class ChessClient {
 
     public String join(String[] userInput) throws DataAccessException {
         Integer gameID;
-        String gameName;
         Integer gameNum;
         try {
             gameNum = Integer.parseInt(userInput[1]);
             gameID = gameList.get(gameNum).gameID();
-            gameName = gameList.get(gameNum).gameName();
         } catch (Exception e) {
             throw new DataAccessException("Invalid game ID", 500);
         }
@@ -101,7 +99,7 @@ public class ChessClient {
         }
         JoinGameRequest joinRequest = new JoinGameRequest(teamColor, gameID);
         ServerFacade serverFacade = new ServerFacade(serverUrl);
-        JoinGameResult joinResult = serverFacade.joinGame(joinRequest, authToken);
+        serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
         return gameToString(gameNum);
     }

@@ -10,14 +10,33 @@ public interface GameDAOInterface {
     void clear() throws DataAccessException;
     Integer createGameID() throws DataAccessException;
     ArrayList<GameData> getGameList() throws DataAccessException;
-    void colorAvailable(String color, Integer gameID) throws DataAccessException;
     void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException;
 
-    default void isAlreadyPlaying(String username, Integer gameID) throws DataAccessException{
-        String blackUser = getGame(gameID).blackUsername();
-        String whiteUser = getGame(gameID).whiteUsername();
-        if (username.equals(blackUser) | username.equals(whiteUser)) {
-            String errorString = "ERROR: " + username + " is already a player in that game";
+    default void isColorAvailable(String username, String color, GameData gameData) throws DataAccessException{
+        String currentPlayer;
+        String currentOpponent;
+        String oppositeColor;
+        switch (color.toUpperCase()) {
+            case "BLACK" -> {
+                currentPlayer = gameData.blackUsername();
+                currentOpponent = gameData.whiteUsername();
+                oppositeColor = "WHITE";
+            }
+            case "WHITE" -> {
+                currentPlayer = gameData.whiteUsername();
+                currentOpponent = gameData.blackUsername();
+                oppositeColor = "BLACK";
+            }
+            default -> throw new DataAccessException("ERROR: team color is invalid", 500);
+        };
+
+        if (!(currentPlayer == null || currentPlayer.equals(username))) {
+            String errorString = "ERROR: " + currentPlayer + " is already playing as " + color;
+            throw new DataAccessException(errorString, 500);
+        }
+
+        if (currentOpponent != null && currentOpponent.equals(username)){
+            String errorString = "ERROR: you are already playing as " + oppositeColor;
             throw new DataAccessException(errorString, 500);
         }
     }

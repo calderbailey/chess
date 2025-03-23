@@ -131,25 +131,9 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     }
 
     @Override
-    public void colorAvailable(String color, Integer gameID) throws DataAccessException {
-        if (color == null | gameID == null) {
-            throw new DataAccessException("Error: bad request", 400);
-        } else if (!(color.equals("WHITE") | color.equals("BLACK"))) {
-            throw new DataAccessException("Error: bad request", 400);
-        } else {
-            GameData game = getGame(gameID);
-            if (!((color.equals("WHITE") & game.whiteUsername() == null) |
-                (color.equals("BLACK") & game.blackUsername() == null))) {
-                throw new DataAccessException("Error: already taken", 403);
-            }
-        }
-    }
-
-    @Override
     public void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException {
-        colorAvailable(playerColor, gameID);
-        isAlreadyPlaying(username, gameID);
         GameData game = getGame(gameID);
+        isColorAvailable(username, playerColor, game);
         GameData updatedGame;
         if (playerColor.equals("WHITE")) {
             updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
