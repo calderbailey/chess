@@ -1,10 +1,8 @@
 package ui;
 
-import chess.ChessGame;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import requestresult.*;
-import chess.ChessGame.TeamColor;
 import java.util.HashMap;
 
 public class ChessClient {
@@ -84,23 +82,40 @@ public class ChessClient {
                 "   Black: " + blackUser + "\n";
     }
 
-    public String join(String[] userInput) throws DataAccessException {
+    public JoinObserveResult join(String[] userInput) throws DataAccessException {
+        updateGameList();
         Integer gameID;
         Integer gameNum;
         try {
             gameNum = Integer.parseInt(userInput[1]);
             gameID = gameList.get(gameNum).gameID();
         } catch (Exception e) {
-            throw new DataAccessException("Invalid game ID", 500);
+            throw new DataAccessException("ERROR: invalid game ID", 500);
         }
         String teamColor = userInput[2].toUpperCase();
         if (!(teamColor.equals("BLACK") | teamColor.equals("WHITE"))) {
-            throw new DataAccessException("Invalid player color", 500);
+            throw new DataAccessException("ERROR: invalid player color", 500);
         }
         JoinGameRequest joinRequest = new JoinGameRequest(teamColor, gameID);
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
-        return gameToString(gameNum);
+        JoinObserveResult result = new JoinObserveResult(gameToString(gameNum), gameList.get(gameNum));
+        return result;
+    }
+
+    public JoinObserveResult observe(String[] userInput) throws DataAccessException {
+        updateGameList();
+        Integer gameNum;
+        try {
+            gameNum = Integer.parseInt(userInput[1]);
+        } catch (Exception e) {
+            throw new DataAccessException("ERROR: invalid game ID", 500);
+        }
+        if (!gameList.containsKey(gameNum)) {
+            throw new DataAccessException("ERROR: game does not exist", 500);
+        }
+        JoinObserveResult result = new JoinObserveResult(gameToString(gameNum), gameList.get(gameNum));
+        return result;
     }
 }
