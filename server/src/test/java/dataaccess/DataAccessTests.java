@@ -209,7 +209,7 @@ public class DataAccessTests extends Test {
     public void colorAvailableSuccess() throws Exception{
         GAME_DAO.createGame("Game 1");
         GAME_DAO.updateGame("USER", "BLACK", 1);
-        Assertions.assertDoesNotThrow(() -> GAME_DAO.colorAvailable("WHITE", 1));
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.isColorAvailable("USER", "BLACK", GAME_DAO.getGame(1)));
     }
 
     @org.junit.jupiter.api.Test
@@ -219,7 +219,7 @@ public class DataAccessTests extends Test {
         GAME_DAO.createGame("Game 1");
         GAME_DAO.updateGame("USER", "BLACK", 1);
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
-            GAME_DAO.colorAvailable("BLACK", 1);
+            GAME_DAO.isColorAvailable("USERNAME", "BLACK", GAME_DAO.getGame(1));
         });
         Assertions.assertEquals("Error: already taken", exception.getMessage());
         Assertions.assertEquals(403, exception.getStatusCode());
