@@ -27,7 +27,7 @@ public class PostLoginRepl {
                 eval(userInput);
             } catch (Throwable e) {
                 var msg = e.getMessage();
-                System.out.printf("\n" + SET_TEXT_ITALIC + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n\n");
+                System.out.print("\n" + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n");
                 System.out.print(help());
             }
         }

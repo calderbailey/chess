@@ -1,41 +1,36 @@
 package ui;
 
 import chess.ChessBoard;
-import chess.ChessGame;
 import chess.ChessGame.*;
 import chess.ChessPiece;
 import chess.ChessPiece.*;
 import chess.ChessPosition;
 import model.GameData;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GamePlayRepl {
     private final ChessClient client;
     private final String serverUrl;
-    private boolean proceed = true;
-    private GameData gameData;
-    private ChessBoard board;
-    private static final String LETTERS= " abcdefgh ";
-
-    private static final ChessGame game = new ChessGame();
+    private final GameData gameData;
+    private final ChessBoard board;
+    private final String LETTERS= " abcdefgh ";
 
     public GamePlayRepl(String serverUrl, GameData gameData) {
         this.serverUrl = serverUrl;
         this.gameData = gameData;
-        board = gameData.game().getBoard();
+        board = new ChessBoard();
+        board.resetBoard();
         client = new ChessClient(serverUrl);
     }
 
     public void run(){
-        System.out.print("YOU HAVE REACHED THE GAMEPLAYREPL\n");
-        System.out.printf(gameData.toString() + "\n\n");
+        printBoard();
         new PostLoginRepl(serverUrl).run();
     }
 
     public void printBoard(){
-        char[] boardArray = chessboardToCharacterArray();
+        char[] boardArray = teamColorModifier(chessboardToCharacterArray());
         String boardString = combinedBoardString(boardArray);
         System.out.printf(boardString);
     }
@@ -65,7 +60,23 @@ public class GamePlayRepl {
         chessString.append(LETTERS);
         return chessString.toString().toCharArray();
     }
-    
+
+    private char[] teamColorModifier(char[] chessArray) {
+        String username = client.getUsername();
+        if (username.equals(gameData.whiteUsername())) {
+            // Reverse row numbers only
+            for (int i = 0; i < chessArray.length; i++) {
+                // Swap logic based on row numbers only, not pieces
+                if (i >= 1 && i <= 8) {
+                    // Adjust board to show correct row numbering
+                    chessArray[i] = chessArray[8 - i];
+                }
+            }
+        }
+        return chessArray;
+    }
+
+
     private String pieceToSymbol(ChessPiece piece) {
         PieceType type = piece.getPieceType();
         TeamColor color = piece.getTeamColor();
@@ -175,30 +186,5 @@ public class GamePlayRepl {
 
     private String spaceBuilder(char item) {
         return " " + item + " ";
-    }
-
-    private String addBoarder(ArrayList<String> rowStrings) {
-        StringBuilder finalString = new StringBuilder();
-        finalString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                           LETTERS +
-                           EscapeSequences.RESET_BG_COLOR +
-                           "\n");
-        Integer index = 8;
-        for (String row : rowStrings) {
-            finalString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                               " " + index.toString() + " " +
-                               EscapeSequences.RESET_BG_COLOR +
-                               row +
-                               EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                               " " + index.toString() + " " +
-                               EscapeSequences.RESET_BG_COLOR +
-                               "\n");
-            index --;
-        }
-        finalString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY +
-                LETTERS +
-                EscapeSequences.RESET_BG_COLOR +
-                "\n");
-        return finalString.toString();
     }
 }

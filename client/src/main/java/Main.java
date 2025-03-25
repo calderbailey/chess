@@ -12,8 +12,6 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-//        new PreLoginRepl(serverUrl).run();
-        GamePlayRepl gameRepl = new GamePlayRepl(serverUrl, new GameData(1, "USER", "USER","USER", new ChessGame()));
-        gameRepl.printBoard();
+        new PreLoginRepl(serverUrl).run();
     }
 }

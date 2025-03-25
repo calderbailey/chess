@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 public class ChessClient {
     private static String authToken;
+    private static String username;
     private static HashMap<Integer, GameData> gameList;
     private final String serverUrl;
     public ChessClient(String serverUrl) {
@@ -15,7 +16,7 @@ public class ChessClient {
     }
 
     public String Register(String[] userInput) throws DataAccessException {
-        String username = userInput[1];
+        username = userInput[1];
         String password = userInput[2];
         String email = userInput[3];
         ServerFacade serverFacade = new ServerFacade(serverUrl);
@@ -26,7 +27,7 @@ public class ChessClient {
     }
 
     public String Login(String[] userInput) throws DataAccessException {
-        String username = userInput[1];
+        username = userInput[1];
         String password = userInput[2];
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         LoginRequest loginRequest = new LoginRequest(username, password);
@@ -117,5 +118,9 @@ public class ChessClient {
         }
         JoinObserveResult result = new JoinObserveResult(gameToString(gameNum), gameList.get(gameNum));
         return result;
+    }
+
+    public String getUsername(){
+        return username;
     }
 }
