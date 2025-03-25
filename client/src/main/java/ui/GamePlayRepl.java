@@ -2,7 +2,9 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessGame.*;
 import chess.ChessPiece;
+import chess.ChessPiece.*;
 import chess.ChessPosition;
 import model.GameData;
 
@@ -51,7 +53,7 @@ public class GamePlayRepl {
                 if (piece == null) {
                     rowString.append(" ");
                 } else {
-                    rowString.append(board.getPiece(new ChessPosition(row, col)).toString());
+                    rowString.append(pieceToSymbol(board.getPiece(new ChessPosition(row, col))));
                 }
                 col ++;
             }
@@ -62,6 +64,33 @@ public class GamePlayRepl {
         }
         chessString.append(LETTERS);
         return chessString.toString().toCharArray();
+    }
+    
+    private String pieceToSymbol(ChessPiece piece) {
+        PieceType type = piece.getPieceType();
+        TeamColor color = piece.getTeamColor();
+
+        if (color.equals(TeamColor.WHITE)) {
+            switch (type) {
+                case KING: return EscapeSequences.WHITE_KING;
+                case QUEEN: return EscapeSequences.WHITE_QUEEN;
+                case ROOK: return EscapeSequences.WHITE_ROOK;
+                case BISHOP: return EscapeSequences.WHITE_BISHOP;
+                case KNIGHT: return EscapeSequences.WHITE_KNIGHT;
+                case PAWN: return EscapeSequences.WHITE_PAWN;
+                default: return "?";
+            }
+        } else {
+            switch (type) {
+                case KING: return EscapeSequences.BLACK_KING;
+                case QUEEN: return EscapeSequences.BLACK_QUEEN;
+                case ROOK: return EscapeSequences.BLACK_ROOK;
+                case BISHOP: return EscapeSequences.BLACK_BISHOP;
+                case KNIGHT: return EscapeSequences.BLACK_KNIGHT;
+                case PAWN: return EscapeSequences.BLACK_PAWN;
+                default: return "?";
+            }
+        }
     }
 
     private String combinedBoardString(char[] chessPieces) {
@@ -137,7 +166,7 @@ public class GamePlayRepl {
     }
 
     private String whiteSquare(char piece) {
-        return EscapeSequences.SET_BG_COLOR_WHITE + spaceBuilder(piece);
+        return EscapeSequences.SET_BG_COLOR_MEDIUM_GREY + spaceBuilder(piece);
     }
 
     private String blackSquare(char piece) {
