@@ -13,7 +13,7 @@ public class GamePlayRepl {
     private final String serverUrl;
     private final GameData gameData;
     private final ChessBoard board;
-    private final String LETTERS= " abcdefgh ";
+    private static final String LETTERS= " abcdefgh ";
 
     public GamePlayRepl(String serverUrl, GameData gameData) {
         this.serverUrl = serverUrl;

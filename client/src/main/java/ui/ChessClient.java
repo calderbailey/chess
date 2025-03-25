@@ -16,7 +16,7 @@ public class ChessClient {
         gameList = new HashMap<>();
     }
 
-    public String Register(String[] userInput) throws DataAccessException {
+    public String register(String[] userInput) throws DataAccessException {
         username = userInput[1];
         String password = userInput[2];
         String email = userInput[3];
@@ -27,7 +27,7 @@ public class ChessClient {
         return "Logged in as " + username;
     }
 
-    public String Login(String[] userInput) throws DataAccessException {
+    public String login(String[] userInput) throws DataAccessException {
         username = userInput[1];
         String password = userInput[2];
         ServerFacade serverFacade = new ServerFacade(serverUrl);
@@ -37,7 +37,7 @@ public class ChessClient {
         return "Logged in as " + username;
     }
 
-    public String Create(String[] userInput) throws DataAccessException {
+    public String create(String[] userInput) throws DataAccessException {
         String gameName = userInput[1];
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         CreateRequest createRequest = new CreateRequest(gameName);
@@ -45,7 +45,7 @@ public class ChessClient {
         return gameName + " has been created";
     }
 
-    public String List() throws DataAccessException {
+    public String list() throws DataAccessException {
         updateGameList();
         if (gameList.keySet().isEmpty() || gameList.keySet() == null) {
             return "No active games\n";

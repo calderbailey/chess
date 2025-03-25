@@ -38,10 +38,10 @@ public class PostLoginRepl {
     private void eval(String[] userInput) throws DataAccessException {
         switch (userInput[0].toLowerCase()) {
             case "create":
-                System.out.printf(client.Create(userInput) + "\n");
+                System.out.printf(client.create(userInput) + "\n");
                 break;
             case "list":
-                System.out.printf(client.List() + "\n");
+                System.out.printf(client.list() + "\n");
                 break;
             case "join":
                 JoinObserveResult joinResult = client.join(userInput);

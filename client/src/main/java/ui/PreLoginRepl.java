@@ -37,11 +37,11 @@ public class PreLoginRepl {
     private void eval(String[] userInput) throws DataAccessException {
         switch (userInput[0].toLowerCase()) {
             case "register":
-                System.out.printf(client.Register(userInput) + "\n");
+                System.out.printf(client.register(userInput) + "\n");
                 new PostLoginRepl(serverUrl).run();
                 break;
             case "login":
-                System.out.printf(client.Login(userInput) + "\n");
+                System.out.printf(client.login(userInput) + "\n");
                 new PostLoginRepl(serverUrl).run();
                 break;
             case "help":
