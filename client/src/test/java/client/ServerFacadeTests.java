@@ -1,16 +1,10 @@
 package client;
 
 import exceptionhandling.DataAccessException;
-import handlers.CreateGameHandler;
 import org.junit.jupiter.api.*;
 import requestresult.*;
 import server.Server;
-import service.GameService;
-import service.UserService;
-import ui.JoinObserveResult;
 import ui.ServerFacade;
-
-import java.awt.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

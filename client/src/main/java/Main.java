@@ -1,10 +1,5 @@
-import chess.ChessGame;
 import exceptionhandling.DataAccessException;
-import model.GameData;
-import requestresult.RegisterRequest;
 import ui.PreLoginRepl;
-import ui.ServerFacade;
-import ui.*;
 
 public class Main {
     public static void main(String[] args) throws DataAccessException {

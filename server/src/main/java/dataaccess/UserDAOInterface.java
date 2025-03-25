@@ -4,8 +4,6 @@ import exceptionhandling.DataAccessException;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
-
 public interface UserDAOInterface {
     void createUser(UserData userData) throws DataAccessException;
     UserData getUser(String username) throws DataAccessException;

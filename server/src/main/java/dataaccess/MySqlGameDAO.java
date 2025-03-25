@@ -2,10 +2,9 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import exceptionhandling.*;
+import exceptionhandling.DataAccessException;
 import model.GameData;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {

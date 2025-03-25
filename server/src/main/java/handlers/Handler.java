@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.*;
 import exceptionhandling.DataAccessException;
-import model.AuthData;
 import model.GameData;
 import spark.Request;
 import static service.Service.DATABASE_METHOD;

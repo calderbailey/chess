@@ -1,7 +1,6 @@
 package handlers;
 
 import exceptionhandling.DataAccessException;
-import org.eclipse.jetty.util.log.Log;
 import requestresult.LogoutRequest;
 import requestresult.LogoutResult;
 import service.UserService;

@@ -1,8 +1,8 @@
 package ui;
 
 import exceptionhandling.DataAccessException;
-import requestresult.*;
 import com.google.gson.Gson;
+import requestresult.*;
 import java.io.*;
 import java.net.*;
 import java.net.HttpURLConnection;

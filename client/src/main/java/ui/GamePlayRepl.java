@@ -6,7 +6,6 @@ import chess.ChessPiece;
 import chess.ChessPiece.*;
 import chess.ChessPosition;
 import model.GameData;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GamePlayRepl {
@@ -64,18 +63,18 @@ public class GamePlayRepl {
     private char[] teamColorModifier(char[] chessArray) {
         String username = client.getUsername();
         if (username.equals(gameData.whiteUsername())) {
-            // Reverse row numbers only
-            for (int i = 0; i < chessArray.length; i++) {
-                // Swap logic based on row numbers only, not pieces
-                if (i >= 1 && i <= 8) {
-                    // Adjust board to show correct row numbering
-                    chessArray[i] = chessArray[8 - i];
-                }
+            int left = 0;
+            int right = chessArray.length-1;
+            while (left < right) {
+                char temp = chessArray[left];
+                chessArray[left] = chessArray[right];
+                chessArray[right] = temp;
+                left++;
+                right--;
             }
         }
         return chessArray;
     }
-
 
     private String pieceToSymbol(ChessPiece piece) {
         PieceType type = piece.getPieceType();
