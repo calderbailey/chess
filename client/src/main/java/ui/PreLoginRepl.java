@@ -16,7 +16,7 @@ public class PreLoginRepl {
     }
 
     public void run() {
-        System.out.println(WHITE_QUEEN + "Welcome to Chess! Type Help to get started." + WHITE_QUEEN);
+        System.out.println("Welcome to Chess! Type Help to get started.");
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (proceed) {
