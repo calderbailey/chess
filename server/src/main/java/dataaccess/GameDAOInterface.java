@@ -30,7 +30,9 @@ public interface GameDAOInterface {
                 }
                 default -> throw new DataAccessException("ERROR: bad request", 400);
             }
-        } else throw new DataAccessException("Error: bad request", 400);
+        } else {
+            throw new DataAccessException("Error: bad request", 400);
+        }
 
 
         if (!(currentPlayer == null || currentPlayer.equals(username))) {
