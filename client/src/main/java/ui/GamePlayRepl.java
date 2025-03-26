@@ -9,18 +9,18 @@ import model.GameData;
 import java.util.Arrays;
 
 public class GamePlayRepl {
-    private final ChessClient client;
     private final String serverUrl;
     private final GameData gameData;
     private final ChessBoard board;
+    private final String teamColor;
     private static final String LETTERS= " abcdefgh ";
 
-    public GamePlayRepl(String serverUrl, GameData gameData) {
+    public GamePlayRepl(String serverUrl, GameData gameData, String teamColor) {
         this.serverUrl = serverUrl;
         this.gameData = gameData;
         board = new ChessBoard();
         board.resetBoard();
-        client = new ChessClient(serverUrl);
+        this.teamColor = teamColor;
     }
 
     public void run(){
@@ -29,8 +29,9 @@ public class GamePlayRepl {
     }
 
     public void printBoard(){
-        char[] boardArray = teamColorModifier(chessboardToCharacterArray());
-        String boardString = combinedBoardString(boardArray);
+        char[] boardArray = chessboardToCharacterArray();
+        char[] modifiedBoardArray = teamColorModifier(boardArray);
+        String boardString = combinedBoardString(modifiedBoardArray);
         System.out.printf(boardString);
     }
 
@@ -41,7 +42,7 @@ public class GamePlayRepl {
         int col = 1;
         while (row <= 8) {
             StringBuilder rowString = new StringBuilder();
-            rowString.append(row);
+            rowString.append(9-row);
             while (col <= 8) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 if (piece == null) {
@@ -51,7 +52,7 @@ public class GamePlayRepl {
                 }
                 col ++;
             }
-            rowString.append(row);
+            rowString.append(9-row);
             chessString.append(rowString);
             row ++;
             col = 1;
@@ -61,20 +62,25 @@ public class GamePlayRepl {
     }
 
     private char[] teamColorModifier(char[] chessArray) {
-        String username = client.getUsername();
-        if (username.equals(gameData.whiteUsername())) {
-            int left = 0;
-            int right = chessArray.length-1;
+        if (chessArray == null || chessArray.length <= 1) {
+            return chessArray;
+        }
+        if (teamColor.equalsIgnoreCase("BLACK")) {
+            char[] reversedArray = chessArray.clone();
+            int left = 0, right = reversedArray.length - 1;
             while (left < right) {
-                char temp = chessArray[left];
-                chessArray[left] = chessArray[right];
-                chessArray[right] = temp;
+                char temp = reversedArray[left];
+                reversedArray[left] = reversedArray[right];
+                reversedArray[right] = temp;
                 left++;
                 right--;
             }
+            return reversedArray;
+        } else {
+            return chessArray;
         }
-        return chessArray;
     }
+
 
     private String pieceToSymbol(ChessPiece piece) {
         PieceType type = piece.getPieceType();
