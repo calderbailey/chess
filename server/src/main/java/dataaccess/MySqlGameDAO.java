@@ -51,7 +51,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+            throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
         }
     }
 
@@ -69,7 +69,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+            throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
         }
         return null;
     }
@@ -91,7 +91,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
                     if (rs.next()) {
                         gameID = rs.getInt("gameID");
                     } else {
-                        throw new DataAccessException("No gameID found in nextGameID table.", 500);
+                        throw new DataAccessException("Error: No gameID found in nextGameID table.", 400);
                     }
                 }
             }
@@ -105,7 +105,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
             }
             return gameID;
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+            throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
         }
     }
 
@@ -125,7 +125,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+            throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
         }
     }
 
@@ -149,7 +149,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
             ps.setInt(2, gameID);
             ps.executeUpdate();
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()), 500);
+            throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
         }
     }
 

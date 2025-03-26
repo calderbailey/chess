@@ -158,8 +158,8 @@ public class ServerFacadeTests {
         DataAccessException exception = Assertions.assertThrows(DataAccessException.class, () -> {
             facade.joinGame(joinRequest1, authData1.authToken());
         });
-        Assertions.assertEquals("ERROR: USERNAME is already playing as WHITE", exception.getMessage());
-        Assertions.assertEquals(500, exception.getStatusCode());
+        Assertions.assertEquals("Error: already taken", exception.getMessage());
+        Assertions.assertEquals(403, exception.getStatusCode());
     }
 }
 

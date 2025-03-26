@@ -16,28 +16,26 @@ public interface GameDAOInterface {
         String currentPlayer;
         String currentOpponent;
         String oppositeColor;
-        switch (color.toUpperCase()) {
-            case "BLACK" -> {
-                currentPlayer = gameData.blackUsername();
-                currentOpponent = gameData.whiteUsername();
-                oppositeColor = "WHITE";
+        if (color != null) {
+            switch (color.toUpperCase()) {
+                case "BLACK" -> {
+                    currentPlayer = gameData.blackUsername();
+                    currentOpponent = gameData.whiteUsername();
+                    oppositeColor = "WHITE";
+                }
+                case "WHITE" -> {
+                    currentPlayer = gameData.whiteUsername();
+                    currentOpponent = gameData.blackUsername();
+                    oppositeColor = "BLACK";
+                }
+                default -> throw new DataAccessException("ERROR: bad request", 400);
             }
-            case "WHITE" -> {
-                currentPlayer = gameData.whiteUsername();
-                currentOpponent = gameData.blackUsername();
-                oppositeColor = "BLACK";
-            }
-            default -> throw new DataAccessException("ERROR: team color is invalid", 500);
-        };
+        } else throw new DataAccessException("Error: bad request", 400);
+
 
         if (!(currentPlayer == null || currentPlayer.equals(username))) {
-            String errorString = "ERROR: " + currentPlayer + " is already playing as " + color;
-            throw new DataAccessException(errorString, 500);
-        }
-
-        if (currentOpponent != null && currentOpponent.equals(username)){
-            String errorString = "ERROR: you are already playing as " + oppositeColor;
-            throw new DataAccessException(errorString, 500);
+            String errorString = "Error: already taken";
+            throw new DataAccessException(errorString, 403);
         }
     }
 }
