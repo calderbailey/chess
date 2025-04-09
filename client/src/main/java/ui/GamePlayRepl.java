@@ -5,8 +5,12 @@ import chess.ChessGame.*;
 import chess.ChessPiece;
 import chess.ChessPiece.*;
 import chess.ChessPosition;
+import exceptionhandling.DataAccessException;
 import model.GameData;
 import java.util.Arrays;
+import java.util.Scanner;
+
+import static ui.EscapeSequences.*;
 
 public class GamePlayRepl {
     private final String serverUrl;
@@ -14,6 +18,7 @@ public class GamePlayRepl {
     private final ChessBoard board;
     private final String teamColor;
     private static final String LETTERS= " abcdefgh ";
+    private boolean proceed = true;
 
     public GamePlayRepl(String serverUrl, GameData gameData, String teamColor) {
         this.serverUrl = serverUrl;
@@ -24,9 +29,61 @@ public class GamePlayRepl {
     }
 
     public void run(){
-        printBoard();
-        new PostLoginRepl(serverUrl).run();
+        Scanner scanner = new Scanner(System.in);
+        while (proceed) {
+            String[] userInput = parseInput(scanner.nextLine());
+            try {
+                checkInput(userInput);
+                eval(userInput);
+            } catch (Throwable e) {
+                var msg = e.getMessage();
+                System.out.print("\n" + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n");
+                System.out.print(help());
+            }
+        }
+        System.exit(1);
     }
+
+    private String[] parseInput(String userInput) {
+        return userInput.split(" ");
+    }
+
+    private void checkInput(String [] arguments) throws IllegalArgumentException{
+        int actualArgs = arguments.length;
+        int expectedArgs = switch (arguments[0].toLowerCase()) {
+            case "redraw", "leave", "resign", "help" -> 1;
+            case "makemove", "highlight" -> 2;
+            default -> throw new IllegalArgumentException("Unknown command: " + arguments[0]);
+        };
+        if (actualArgs != expectedArgs) {
+            throw new IllegalArgumentException("ERROR: Invalid Number of Arguments --" +
+                    "Note: no spaces are allowed within arguments");
+        }
+    }
+
+    private void eval(String[] userInput) throws DataAccessException {
+        switch (userInput[0].toLowerCase()) {
+            case "redraw":
+                System.out.print("redraw command \n");
+                break;
+            case "leave":
+                System.out.print("leave command \n");
+                break;
+            case "makemove":
+                System.out.print("makeMove command \n");
+                break;
+            case "resign":
+                System.out.print("resign command \n");
+                break;
+            case "highlight":
+                System.out.print("highlight command \n");
+                break;
+            case "help":
+                System.out.printf(help());
+                break;
+        }
+    }
+
 
     public void printBoard(){
         char[] boardArray = chessboardToCharacterArray();
@@ -191,5 +248,20 @@ public class GamePlayRepl {
 
     private String spaceBuilder(char item) {
         return " " + item + " ";
+    }
+
+    private String help() {
+        return (SET_TEXT_COLOR_BLUE + "redraw <NAME> " +
+                SET_TEXT_COLOR_MAGENTA + "- chess board\n" +
+                SET_TEXT_COLOR_BLUE + "leave " +
+                SET_TEXT_COLOR_MAGENTA + "- game\n" +
+                SET_TEXT_COLOR_BLUE + "makeMove <ChessMove>\n" +
+                SET_TEXT_COLOR_BLUE + "resign " +
+                SET_TEXT_COLOR_MAGENTA + "- from game\n" +
+                SET_TEXT_COLOR_BLUE + "highlight <ChessPiece> " +
+                SET_TEXT_COLOR_MAGENTA + "- legal moves\n" +
+                SET_TEXT_COLOR_BLUE + "help " +
+                SET_TEXT_COLOR_MAGENTA + "- with possible commands\n" +
+                RESET_TEXT_COLOR);
     }
 }
