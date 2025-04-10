@@ -5,6 +5,7 @@ import exceptionhandling.DataAccessException;
 import model.GameData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -110,5 +111,9 @@ public class PostLoginRepl implements NotificationHandler{
 
     @Override
     public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> System.out.printf(((LoadGameMessage) message).getGame().toString() + "\n");
+            default -> System.out.printf("OTHER MESSAGE TYPE \n");
+        }
     }
 }

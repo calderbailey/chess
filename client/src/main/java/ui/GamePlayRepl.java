@@ -386,6 +386,5 @@ public class GamePlayRepl implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-        System.out.print(notification.toString());
     }
 }

@@ -31,12 +31,12 @@ public class ServerMessage {
         return this.serverMessageType;
     }
 
-
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return "ServerMessage{" +
+                "serverMessageType=" + serverMessageType +
+                '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
