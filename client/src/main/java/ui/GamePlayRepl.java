@@ -105,11 +105,17 @@ public class GamePlayRepl {
         ArrayList<Integer> formattedArgs = highlightArgFormatter(userInput);
         ChessPosition position = new ChessPosition(formattedArgs.get(0), formattedArgs.get(1));
         ChessPiece piece = board.getPiece(position);
-        Collection <ChessMove> possibleMoves = piece.pieceMoves(board, position);
-        for (ChessMove move : possibleMoves) {
-            System.out.print(move.toString() + "\n");
+        if (piece != null) {
+            Collection <ChessMove> possibleMoves = piece.pieceMoves(board, position);
+            Set<ChessPosition> highlightSquares = new LinkedHashSet<>();
+            highlightSquares.add(position);
+            for (ChessMove move : possibleMoves) {
+                highlightSquares.add(move.getEndPosition());
+            }
+            printBoard(highlightSquares);
+        } else {
+            throw new DataAccessException("ERROR: no piece found at position (" + userInput[1] + ", " + userInput[2] + ")", 405);
         }
-        printBoard();
     }
 
     private ArrayList<Integer> highlightArgFormatter(String[] userInput) throws DataAccessException {
@@ -122,7 +128,7 @@ public class GamePlayRepl {
         } catch (Exception e) {
             throw new DataAccessException("ERROR: row value must be an integer between 1 and 8", 405);
         }
-        Character col;
+        char col;
         try {
             col = userInput[2].charAt(0);
             if (!COLUMN_MAP.containsKey(col)) {
@@ -131,17 +137,22 @@ public class GamePlayRepl {
         } catch (Exception e) {
             throw new DataAccessException("ERROR: col value must be a letter between a and h", 405);
         }
+        int colInt = COLUMN_MAP.get(col);
+        if (teamColor.equalsIgnoreCase("BLACK")) {
+            row = 9-row;
+            colInt = 9-colInt;
+        }
         ArrayList<Integer> formattedInput = new ArrayList<>();
         formattedInput.add(row);
-        formattedInput.add(COLUMN_MAP.get(col));
+        formattedInput.add(colInt);
         return formattedInput;
     }
 
-    private void printBoard(){
+    private void printBoard(Set<ChessPosition> highlightSquares){
         char[] boardArray = chessboardToCharacterArray();
         char[] modifiedBoardArray = teamColorModifier(boardArray);
-        String boardString = combinedBoardString(modifiedBoardArray);
-        System.out.printf(boardString);
+        String boardString = combinedBoardString(modifiedBoardArray, highlightSquares);
+        System.out.printf( "\n" + boardString + "\n");
     }
 
     private char[] chessboardToCharacterArray(){
@@ -218,7 +229,7 @@ public class GamePlayRepl {
         }
     }
 
-    private String combinedBoardString(char[] chessPieces) {
+    private String combinedBoardString(char[] chessPieces, Set<ChessPosition> highlightSquares) {
         StringBuilder finalString = new StringBuilder();
         int startIndex = 0;
         int endIndex= 10;
@@ -226,11 +237,13 @@ public class GamePlayRepl {
         startIndex = incrementIndex(startIndex);
         endIndex = incrementIndex(endIndex);
         String rowColor = "WHITE";
+        int row = 8;
         while (endIndex < 99) {
-            finalString.append(rowMaker(Arrays.copyOfRange(chessPieces, startIndex, endIndex), rowColor));
+            finalString.append(rowMaker(Arrays.copyOfRange(chessPieces, startIndex, endIndex), row, rowColor, highlightSquares));
             rowColor = rowColorSwitch(rowColor);
             startIndex = incrementIndex(startIndex);
             endIndex = incrementIndex(endIndex);
+            row --;
         }
         finalString.append(boarderRowMaker(Arrays.copyOfRange(chessPieces, startIndex, endIndex)));
         return finalString.toString();
@@ -258,28 +271,43 @@ public class GamePlayRepl {
         return rowString.toString();
     }
 
-    private String rowMaker(char[] rowChars, String rowColor) {
+    private String rowMaker(char[] rowChars, Integer row, String rowColor, Set<ChessPosition> highlightSquares) {
         StringBuilder rowString = new StringBuilder();
         int index = 0;
         rowString.append(boarderSquare(rowChars[index]));
         index ++;
         String squareColor = rowColor;
+        ChessPosition pos;
+        ChessPosition initialPos = highlightSquares.iterator().next();
         while (index <=8) {
-            switch (squareColor) {
-                case "WHITE" -> {
-                    rowString.append(whiteSquare(rowChars[index]));
-                    squareColor = "BLACK";
+            pos = new ChessPosition(row, index);
+            if (highlightSquares != null && highlightSquares.contains(pos)) {
+                if (pos.equals(initialPos)) {
+                    rowString.append(initialSquare(rowChars[index], squareColor));
+                } else {
+                    rowString.append(highlightedSquare(rowChars[index], squareColor));
+                    squareColor = squareColorSwap(squareColor);
                 }
-                case "BLACK" -> {
-                    rowString.append(blackSquare(rowChars[index]));
-                    squareColor = "WHITE";
-                }
+            } else if (squareColor.equals("WHITE")) {
+                rowString.append(whiteSquare(rowChars[index]));
+                squareColor = squareColorSwap(squareColor);
+            } else {
+                rowString.append(blackSquare(rowChars[index]));
+                squareColor = squareColorSwap(squareColor);
             }
             index ++;
         }
         rowString.append(boarderSquare(rowChars[index]));
         rowString.append(newLine());
         return rowString.toString();
+    }
+
+    private String squareColorSwap(String squareColor) {
+        if (squareColor == "WHITE") {
+            return "BLACK";
+        } else {
+            return "WHITE";
+        }
     }
 
     private String newLine() {
@@ -296,6 +324,23 @@ public class GamePlayRepl {
 
     private String blackSquare(char piece) {
         return SET_BG_COLOR_BLACK + spaceBuilder(piece);
+    }
+
+    private String highlightedSquare(char piece, String squareColor) {
+        switch (squareColor) {
+            case "WHITE" -> {
+                return SET_BG_COLOR_LIGHT_BLUE + spaceBuilder(piece);
+            }
+            case "BLACK" -> {
+                return SET_BG_COLOR_BLUE + spaceBuilder(piece);
+            }
+
+        }
+        return SET_BG_COLOR_BLUE + spaceBuilder(piece);
+    }
+
+    private String initialSquare(char piece, String squareColor) {
+        return SET_BG_COLOR_DARK_GREEN + spaceBuilder(piece);
     }
 
     private String spaceBuilder(char item) {
