@@ -9,6 +9,7 @@ import chess.ChessPosition;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import ui.websocket.NotificationHandler;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -396,7 +397,10 @@ public class GamePlayRepl implements NotificationHandler {
                 String notice = ((NotificationMessage) message).getMessage();
                 System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + notice + "  <<<" + RESET_TEXT_COLOR + "\n");
             }
-            default -> System.out.printf("OTHER MESSAGE TYPE \n");
+            case ERROR -> {
+                String errorMessage = ((ErrorMessage) message).getErrorMessage();
+                System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + errorMessage + "  <<<" + RESET_TEXT_COLOR + "\n");
+            }
         }
     }
 }

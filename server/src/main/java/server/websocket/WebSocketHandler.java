@@ -11,10 +11,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
-import websocket.messages.CustomServerMessageSerializer;
+import websocket.messages.*;
 
 import javax.print.attribute.standard.Severity;
 import java.io.IOException;
@@ -50,11 +47,17 @@ public class WebSocketHandler {
     }
 
     private void Connect(String teamColor, int gameID, String authToken, Session session) throws IOException, DataAccessException {
-        connections.add(authToken, gameID, session);
-        LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
-        connections.send(authToken, notification);
-        String username = AUTHDAO.getAuth(authToken).username();
-        NotificationMessage broadcastNotification = new NotificationMessage(username + " has entered the game as the " + teamColor + " player");
-        connections.broadcast(authToken, gameID, broadcastNotification);
+        if (AUTHDAO.getAuth(authToken) == null || GAMEDAO.getGame(gameID) == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: Bad Input");
+            session.getRemote().sendString(gson.toJson(errorMessage));
+            System.out.printf("HERE");
+        } else {
+            connections.add(authToken, gameID, session);
+            LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
+            connections.send(authToken, notification);
+            String username = AUTHDAO.getAuth(authToken).username();
+            NotificationMessage broadcastNotification = new NotificationMessage(username + " has entered the game as the " + teamColor + " player");
+            connections.broadcast(authToken, gameID, broadcastNotification);
+        }
     }
 }

@@ -30,6 +30,9 @@ public class CustomServerMessageSerializer implements JsonSerializer<ServerMessa
             } else {
                 jsonObject.addProperty("message", "NULL");
             }
+        } else if (src instanceof ErrorMessage) {
+            String errorMessage = ((ErrorMessage) src).getErrorMessage();
+            jsonObject.addProperty("errorMessage", Objects.requireNonNullElse(errorMessage, "NULL"));
         }
         return jsonObject;
     }
@@ -62,8 +65,16 @@ public class CustomServerMessageSerializer implements JsonSerializer<ServerMessa
                 notificationMessage.setMessage(message);
             }
             serverMessage = notificationMessage;
+        } else if ("ERROR".equals(serverMessageType)) {
+            ErrorMessage errorMessage = new ErrorMessage(null);
+            // Deserialize the message object if it's present
+            JsonElement errorMessageElement = jsonObject.get("errorMessage");
+            if (errorMessageElement != null && !errorMessageElement.isJsonNull()) {
+                String message = gson.fromJson(errorMessageElement, String.class);
+                errorMessage.setErrorMessage(message);
+            }
+            serverMessage = errorMessage;
         }
-
         return serverMessage;
     }
 }
