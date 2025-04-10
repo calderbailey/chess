@@ -57,5 +57,4 @@ public class WebSocketFacade extends Endpoint {
             throw new DataAccessException(ex.getMessage(), 500);
         }
     }
-
 }

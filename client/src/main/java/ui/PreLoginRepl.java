@@ -14,7 +14,7 @@ public class PreLoginRepl implements NotificationHandler {
 
     public PreLoginRepl(String serverUrl) {
         this.serverUrl = serverUrl;
-        client = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl);
     }
 
     public void run() {

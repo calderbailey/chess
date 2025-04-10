@@ -9,6 +9,7 @@ import chess.ChessPosition;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import ui.websocket.NotificationHandler;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.*;
@@ -17,17 +18,16 @@ import static ui.EscapeSequences.*;
 
 public class GamePlayRepl implements NotificationHandler {
     private final String serverUrl;
-    private final GameData gameData;
     private final ChessBoard board;
     private final String teamColor;
     private static final String LETTERS= " abcdefgh ";
     private static final Map<Character, Integer> COLUMN_MAP;
     private boolean proceed = true;
     private final String playerStatus;
+    private GameData gameData;
 
-    public GamePlayRepl(String serverUrl, GameData gameData, String teamColor, String playerStatus) {
+    public GamePlayRepl(String serverUrl, String teamColor, String playerStatus) {
         this.serverUrl = serverUrl;
-        this.gameData = gameData;
         board = new ChessBoard();
         board.resetBoard();
         this.teamColor = teamColor;
@@ -50,7 +50,6 @@ public class GamePlayRepl implements NotificationHandler {
     public void run(){
         Scanner scanner = new Scanner(System.in);
         while (proceed) {
-            printPrompt();
             String[] userInput = parseInput(scanner.nextLine());
             try {
                 checkInput(userInput);
@@ -385,6 +384,14 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     @Override
-    public void notify(ServerMessage notification) {
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> {
+                gameData = ((LoadGameMessage) message).getGame();
+                redraw();
+                printPrompt();
+            }
+            default -> System.out.printf("OTHER MESSAGE TYPE \n");
+        }
     }
 }

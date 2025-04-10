@@ -6,19 +6,20 @@ import model.GameData;
 import requestresult.*;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.HashMap;
 
-public class ChessClient {
+public class ChessClient{
     private static String authToken;
     private static String username;
     private static HashMap<Integer, GameData> gameList;
     private final String serverUrl;
-    private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
-    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
+    private GameData gameData;
+    public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
         gameList = new HashMap<>();
     }
 
@@ -90,7 +91,7 @@ public class ChessClient {
                 "   Black: " + blackUser + "\n";
     }
 
-    public JoinObserveResult join(String[] userInput) throws DataAccessException {
+    public void join(String[] userInput) throws DataAccessException {
         updateGameList();
         Integer gameID;
         Integer gameNum;
@@ -108,10 +109,8 @@ public class ChessClient {
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws = new WebSocketFacade(serverUrl, new GamePlayRepl(serverUrl, teamColor, "Playing"));
         ws.connect(authToken, gameID);
-        JoinObserveResult result = new JoinObserveResult(gameToString(gameNum), gameList.get(gameNum));
-        return result;
     }
 
     public JoinObserveResult observe(String[] userInput) throws DataAccessException {

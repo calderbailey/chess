@@ -12,21 +12,21 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class PostLoginRepl implements NotificationHandler{
+public class PostLoginRepl {
     private final ChessClient client;
     private final String serverUrl;
     private boolean proceed = true;
 
     public PostLoginRepl (String serverUrl) {
         this.serverUrl = serverUrl;
-        client = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl);
     }
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
         var result = "";
+        printPrompt();
         while (proceed) {
-            printPrompt();
             String[] userInput = parseInput(scanner.nextLine());
             try {
                 checkInput(userInput);
@@ -50,14 +50,12 @@ public class PostLoginRepl implements NotificationHandler{
                 System.out.printf(client.list() + "\n");
                 break;
             case "join":
-                JoinObserveResult joinResult = client.join(userInput);
-                System.out.printf(joinResult.gamePrintString());
-                new GamePlayRepl(serverUrl, joinResult.gameData(), userInput[2], "Playing").run();
+                client.join(userInput);
                 break;
             case "observe":
                 JoinObserveResult observeResult = client.observe(userInput);
                 System.out.printf(observeResult.gamePrintString());
-                new GamePlayRepl(serverUrl, observeResult.gameData(), "WHITE", "Observing").run();
+                new GamePlayRepl(serverUrl, "WHITE", "Observing").run();
                 break;
             case "logout":
                 System.out.print("\n");
@@ -107,13 +105,5 @@ public class PostLoginRepl implements NotificationHandler{
                 SET_TEXT_COLOR_BLUE + "help " +
                 SET_TEXT_COLOR_MAGENTA + "- with possible commands\n" +
                 RESET_TEXT_COLOR);
-    }
-
-    @Override
-    public void notify(ServerMessage message) {
-        switch (message.getServerMessageType()) {
-            case LOAD_GAME -> System.out.printf(((LoadGameMessage) message).getGame().toString() + "\n");
-            default -> System.out.printf("OTHER MESSAGE TYPE \n");
-        }
     }
 }
