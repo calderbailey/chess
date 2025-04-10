@@ -45,9 +45,11 @@ public class PostLoginRepl {
         switch (userInput[0].toLowerCase()) {
             case "create":
                 System.out.printf(client.create(userInput) + "\n");
+                printPrompt();
                 break;
             case "list":
                 System.out.printf(client.list() + "\n");
+                printPrompt();
                 break;
             case "join":
                 client.join(userInput);
@@ -104,6 +106,7 @@ public class PostLoginRepl {
                 SET_TEXT_COLOR_MAGENTA + "- when you are done\n" +
                 SET_TEXT_COLOR_BLUE + "help " +
                 SET_TEXT_COLOR_MAGENTA + "- with possible commands\n" +
-                RESET_TEXT_COLOR);
+                RESET_TEXT_COLOR +
+                "[" + CurrentState.Logged_In + "] >>> ");
     }
 }

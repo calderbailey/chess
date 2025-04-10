@@ -1,5 +1,6 @@
 package ui.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptionhandling.DataAccessException;
@@ -20,9 +21,11 @@ public class WebSocketFacade extends Endpoint {
     Gson gson = new GsonBuilder()
             .registerTypeAdapter(ServerMessage.class, new CustomServerMessageSerializer())
             .create();
+    String teamColor;
 
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws DataAccessException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, String teamColor) throws DataAccessException {
+        this.teamColor = teamColor;
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -51,7 +54,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void connect(String authToken, int gameID) throws DataAccessException {
         try {
-            UserGameCommand action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            UserGameCommand action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, teamColor);
             session.getBasicRemote().sendText(action.toString());
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage(), 500);

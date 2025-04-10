@@ -109,7 +109,7 @@ public class ChessClient{
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
-        ws = new WebSocketFacade(serverUrl, new GamePlayRepl(serverUrl, teamColor, "Playing"));
+        ws = new WebSocketFacade(serverUrl, new GamePlayRepl(serverUrl, teamColor, "Playing"), teamColor);
         ws.connect(authToken, gameID);
     }
 

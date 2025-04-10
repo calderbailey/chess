@@ -23,6 +23,13 @@ public class CustomServerMessageSerializer implements JsonSerializer<ServerMessa
             } else {
                 jsonObject.addProperty("game", "NULL");
             }
+        } else if (src instanceof NotificationMessage) {
+            String message = ((NotificationMessage) src).getMessage();
+            if (message != null) {
+                jsonObject.addProperty("message", message);
+            } else {
+                jsonObject.addProperty("message", "NULL");
+            }
         }
         return jsonObject;
     }
@@ -46,6 +53,15 @@ public class CustomServerMessageSerializer implements JsonSerializer<ServerMessa
                 loadGameMessage.setGame(gameData);
             }
             serverMessage = loadGameMessage;
+        } else if ("NOTIFICATION".equals(serverMessageType)) {
+            NotificationMessage notificationMessage = new NotificationMessage(null);
+            // Deserialize the message object if it's present
+            JsonElement messageElement = jsonObject.get("message");
+            if (messageElement != null && !messageElement.isJsonNull()) {
+                String message = gson.fromJson(messageElement, String.class);
+                notificationMessage.setMessage(message);
+            }
+            serverMessage = notificationMessage;
         }
 
         return serverMessage;
