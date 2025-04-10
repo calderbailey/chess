@@ -21,13 +21,15 @@ public class GamePlayRepl {
     private static final String LETTERS= " abcdefgh ";
     private static final Map<Character, Integer> COLUMN_MAP;
     private boolean proceed = true;
+    private final String playerStatus;
 
-    public GamePlayRepl(String serverUrl, GameData gameData, String teamColor) {
+    public GamePlayRepl(String serverUrl, GameData gameData, String teamColor, String playerStatus) {
         this.serverUrl = serverUrl;
         this.gameData = gameData;
         board = new ChessBoard();
         board.resetBoard();
         this.teamColor = teamColor;
+        this.playerStatus = playerStatus;
 
     }
 
@@ -87,9 +89,15 @@ public class GamePlayRepl {
                 System.out.print("leave command \n");
                 break;
             case "makemove":
+                if (playerStatus == "Observing") {
+                    throw new DataAccessException("ERROR: you cannot make a move as an observer", 500);
+                }
                 System.out.print("makeMove command \n");
                 break;
             case "resign":
+                if (playerStatus == "Observing") {
+                    throw new DataAccessException("ERROR: you cannot resign as an observer", 500);
+                }
                 System.out.print("resign command \n");
                 break;
             case "highlight":
@@ -367,7 +375,11 @@ public class GamePlayRepl {
     }
 
     private void printPrompt() {
-        System.out.print("[Playing] >>> ");
+        if (Objects.equals(playerStatus, "Playing")) {
+            System.out.print("[Playing] >>> ");
+        } else {
+            System.out.print("[Observing] >>> ");
+        }
     }
 
 }
