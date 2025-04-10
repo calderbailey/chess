@@ -2,9 +2,11 @@ package server;
 
 import exceptionhandling.DataAccessException;
 import handlers.*;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 public class Server {
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -13,6 +15,9 @@ public class Server {
 
 //         Register your endpoints and handle exceptions here.
 //
+        Spark.webSocket("/ws", webSocketHandler);
+
+
         Spark.delete("/db", (req, res) -> {
             return new DeleteHandler().handleRequest();
         });
@@ -56,4 +61,6 @@ public class Server {
         res.status(ex.getStatusCode());
         res.body(ex.toJson());
     }
+
+
 }

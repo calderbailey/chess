@@ -8,12 +8,14 @@ import chess.ChessPiece.*;
 import chess.ChessPosition;
 import exceptionhandling.DataAccessException;
 import model.GameData;
+import ui.websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.*;
 
 import static ui.EscapeSequences.*;
 
-public class GamePlayRepl {
+public class GamePlayRepl implements NotificationHandler {
     private final String serverUrl;
     private final GameData gameData;
     private final ChessBoard board;
@@ -382,4 +384,8 @@ public class GamePlayRepl {
         }
     }
 
+    @Override
+    public void notify(ServerMessage notification) {
+        System.out.print(notification.toString());
+    }
 }

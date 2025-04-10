@@ -1,8 +1,11 @@
 package ui;
 
+import dataaccess.MySqlGameDAO;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import requestresult.*;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 
 import java.util.HashMap;
 
@@ -11,8 +14,11 @@ public class ChessClient {
     private static String username;
     private static HashMap<Integer, GameData> gameList;
     private final String serverUrl;
-    public ChessClient(String serverUrl) {
+    private final NotificationHandler notificationHandler;
+    private WebSocketFacade ws;
+    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
         gameList = new HashMap<>();
     }
 
@@ -102,6 +108,8 @@ public class ChessClient {
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws.connect(authToken, gameID);
         JoinObserveResult result = new JoinObserveResult(gameToString(gameNum), gameList.get(gameNum));
         return result;
     }

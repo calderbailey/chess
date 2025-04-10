@@ -1,18 +1,20 @@
 package ui;
 
 import exceptionhandling.DataAccessException;
+import ui.websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
-public class PreLoginRepl {
+public class PreLoginRepl implements NotificationHandler {
     private final ChessClient client;
     private final String serverUrl;
     private boolean proceed = true;
 
     public PreLoginRepl(String serverUrl) {
         this.serverUrl = serverUrl;
-        client = new ChessClient(serverUrl);
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run() {
@@ -90,5 +92,11 @@ public class PreLoginRepl {
     private String quit() {
         proceed = false;
         return (SET_TEXT_COLOR_BLUE + "Thanks for playing! Goodbye.");
+    }
+
+    @Override
+    public void notify(ServerMessage notification) {
+        System.out.println(SET_TEXT_COLOR_RED + notification.getServerMessageType() + RESET_TEXT_COLOR);
+        printPrompt();
     }
 }

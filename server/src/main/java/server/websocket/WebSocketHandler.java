@@ -1,0 +1,51 @@
+package server.websocket;
+
+import chess.ChessGame;
+import com.google.gson.Gson;
+import dataaccess.*;
+import exceptionhandling.DataAccessException;
+import model.GameData;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.ServerMessage;
+
+import javax.print.attribute.standard.Severity;
+import java.io.IOException;
+import java.util.Timer;
+
+
+@WebSocket
+public class WebSocketHandler {
+    private static MySqlAuthDAO AUTHDAO;
+    private static MySqlGameDAO GAMEDAO;
+
+    static {
+        try {
+            AUTHDAO = new MySqlAuthDAO();
+            GAMEDAO = new MySqlGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final ConnectionManager connections = new ConnectionManager();
+
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws IOException, DataAccessException {
+        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        switch (command.getCommandType()) {
+            case CONNECT -> Connect(command.getGameID(), command.getAuthToken(), session);
+        }
+    }
+
+    private void Connect(int gameID, String authToken, Session session) throws IOException, DataAccessException {
+        connections.add(authToken, session);
+        ServerMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
+        connections.send(authToken, notification);
+    }
+}

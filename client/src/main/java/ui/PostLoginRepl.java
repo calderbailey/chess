@@ -1,19 +1,24 @@
 package ui;
 
+import com.google.gson.Gson;
 import exceptionhandling.DataAccessException;
+import model.GameData;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class PostLoginRepl {
+public class PostLoginRepl implements NotificationHandler{
     private final ChessClient client;
     private final String serverUrl;
     private boolean proceed = true;
 
-    public PostLoginRepl(String serverUrl) {
+    public PostLoginRepl (String serverUrl) {
         this.serverUrl = serverUrl;
-        client = new ChessClient(serverUrl);
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run() {
@@ -101,5 +106,9 @@ public class PostLoginRepl {
                 SET_TEXT_COLOR_BLUE + "help " +
                 SET_TEXT_COLOR_MAGENTA + "- with possible commands\n" +
                 RESET_TEXT_COLOR);
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
     }
 }
