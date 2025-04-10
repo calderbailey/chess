@@ -81,7 +81,7 @@ public class GamePlayRepl {
     private void eval(String[] userInput) throws DataAccessException {
         switch (userInput[0].toLowerCase()) {
             case "redraw":
-                System.out.print("redraw command \n");
+                redraw();
                 break;
             case "leave":
                 System.out.print("leave command \n");
@@ -99,6 +99,10 @@ public class GamePlayRepl {
                 System.out.printf(help());
                 break;
         }
+    }
+
+    private void redraw() {
+        printBoard(null);
     }
 
     private void highlight(String[] userInput) throws DataAccessException {
@@ -278,10 +282,10 @@ public class GamePlayRepl {
         index ++;
         String squareColor = rowColor;
         ChessPosition pos;
-        ChessPosition initialPos = highlightSquares.iterator().next();
         while (index <=8) {
             pos = new ChessPosition(row, index);
             if (highlightSquares != null && highlightSquares.contains(pos)) {
+                ChessPosition initialPos = highlightSquares.iterator().next();
                 if (pos.equals(initialPos)) {
                     rowString.append(initialSquare(rowChars[index], squareColor));
                 } else {
