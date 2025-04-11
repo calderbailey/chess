@@ -18,8 +18,14 @@ public class ChessClient{
     private final String serverUrl;
     private WebSocketFacade ws;
     private GameData gameData;
+    private GamePlayRepl gamePlayRepl;
     public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
+        gameList = new HashMap<>();
+    }
+    public ChessClient(String serverUrl, GamePlayRepl gamePlayRepl) {
+        this.serverUrl = serverUrl;
+        this.gamePlayRepl = gamePlayRepl;
         gameList = new HashMap<>();
     }
 
@@ -109,7 +115,7 @@ public class ChessClient{
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
-        ws = new WebSocketFacade(serverUrl, new GamePlayRepl(serverUrl, teamColor, "Playing"), teamColor);
+        ws = new WebSocketFacade(serverUrl, gamePlayRepl, teamColor);
         ws.connect(authToken, gameID);
     }
 

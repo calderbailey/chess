@@ -21,19 +21,23 @@ import static ui.EscapeSequences.*;
 public class GamePlayRepl implements NotificationHandler {
     private final String serverUrl;
     private final ChessBoard board;
-    private final String teamColor;
+    private final String[] userInput;
     private static final String LETTERS= " abcdefgh ";
     private static final Map<Character, Integer> COLUMN_MAP;
     private boolean proceed = true;
     private final String playerStatus;
     private GameData gameData;
+    private final ChessClient client;
+    private String teamColor;
 
-    public GamePlayRepl(String serverUrl, String teamColor, String playerStatus) {
+    public GamePlayRepl(String serverUrl, String[] userInput, String playerStatus) {
         this.serverUrl = serverUrl;
         board = new ChessBoard();
         board.resetBoard();
-        this.teamColor = teamColor;
+        this.userInput = userInput;
         this.playerStatus = playerStatus;
+        this.client = new ChessClient(serverUrl, this);
+        this.teamColor = userInput[2];
 
     }
 
@@ -49,6 +53,11 @@ public class GamePlayRepl implements NotificationHandler {
         COLUMN_MAP.put('h', 8);
     }
 
+    public void initiate() throws DataAccessException {
+        client.join(userInput);
+        run();
+    }
+
     public void run(){
         Scanner scanner = new Scanner(System.in);
         while (proceed) {
@@ -56,10 +65,12 @@ public class GamePlayRepl implements NotificationHandler {
             try {
                 checkInput(userInput);
                 eval(userInput);
+                printPrompt();
             } catch (Throwable e) {
                 var msg = e.getMessage();
                 System.out.print("\n" + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n");
                 System.out.print(help());
+                printPrompt();
             }
         }
         System.exit(1);
