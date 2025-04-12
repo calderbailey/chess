@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
@@ -72,6 +73,24 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
             throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
         }
         return null;
+    }
+
+    @Override
+    public void setGame(Integer gameID, GameData gameData) throws DataAccessException, SQLException {
+        String gameJson = new Gson().toJson(gameData);
+        try (var conn = DatabaseManager.getConnection()) {
+            String updateStatement = "UPDATE games SET jsonGameData = ? WHERE gameID = ?";
+            try (var ps = conn.prepareStatement(updateStatement)) {
+                ps.setString(1, gameJson);
+                ps.setInt(2, gameID);
+                int updatedRows = ps.executeUpdate();
+                if (updatedRows == 0) {
+                    throw new DataAccessException("Error: gameID not found", 500);
+                }
+            }
+        } catch (Exception e ) {
+            throw new DataAccessException(String.format("Error: Unable to update game: %s", e.getMessage()), 400);
+        }
     }
 
     @Override

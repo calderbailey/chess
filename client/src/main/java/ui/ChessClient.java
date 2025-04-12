@@ -1,14 +1,9 @@
 package ui;
 
-import dataaccess.MySqlGameDAO;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import requestresult.*;
-import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.ServerMessage;
-
 import java.util.HashMap;
 
 public class ChessClient{
@@ -116,6 +111,7 @@ public class ChessClient{
         serverFacade.joinGame(joinRequest, authToken);
         updateGameList();
         ws = new WebSocketFacade(serverUrl, gamePlayRepl, teamColor);
+        gamePlayRepl.setWS(ws);
         ws.connect(authToken, gameID);
     }
 

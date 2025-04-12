@@ -1,9 +1,12 @@
 package ui.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptionhandling.DataAccessException;
+import websocket.commands.CustomUserGameCommandSerializer;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.CustomServerMessageSerializer;
 import websocket.messages.ServerMessage;
@@ -16,13 +19,15 @@ import java.net.URISyntaxException;
 //need to extend Endpoint for websocket to work properly
 public class WebSocketFacade extends Endpoint {
 
-    Session session;
-    NotificationHandler notificationHandler;
-    Gson gson = new GsonBuilder()
+    private final Session session;
+    private NotificationHandler notificationHandler;
+    private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(ServerMessage.class, new CustomServerMessageSerializer())
+            .registerTypeAdapter(CustomUserGameCommandSerializer.class, new CustomUserGameCommandSerializer())
             .create();
-    String teamColor;
-
+    private final String teamColor;
+    private String authToken = null;
+    private Integer gameID = null;
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler, String teamColor) throws DataAccessException {
         this.teamColor = teamColor;
@@ -47,6 +52,26 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    private void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    private String getAuthToken() {
+        return this.authToken;
+    }
+
+    private void setGameID(Integer gameID) {
+        this.gameID = gameID;
+    }
+
+    private Integer getGameID() {
+        return this.gameID;
+    }
+
+    private String getTeamColor() {
+        return this.teamColor;
+    }
+
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
@@ -54,8 +79,19 @@ public class WebSocketFacade extends Endpoint {
 
     public void connect(String authToken, int gameID) throws DataAccessException {
         try {
+            setAuthToken(authToken);
+            setGameID(gameID);
             UserGameCommand action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, teamColor);
-            session.getBasicRemote().sendText(action.toString());
+            session.getBasicRemote().sendText(gson.toJson(action));
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage(), 500);
+        }
+    }
+
+    public void makeMove(ChessMove move) throws DataAccessException {
+        try {
+            MakeMoveCommand action = new MakeMoveCommand(getAuthToken(), getGameID(), getTeamColor(), move);
+            session.getBasicRemote().sendText(gson.toJson(action));
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage(), 500);
         }

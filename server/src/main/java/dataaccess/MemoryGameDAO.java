@@ -30,6 +30,11 @@ public class MemoryGameDAO implements GameDAOInterface{
     }
 
     @Override
+    public void setGame(Integer gameID, GameData game) {
+        GAME_MAP.replace(gameID, game);
+    }
+
+    @Override
     public void clear() {
         GAME_MAP.clear();
         nextGameID = 1;

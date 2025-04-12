@@ -9,6 +9,7 @@ public record GameData(Integer gameID,
                        String blackUsername,
                        String gameName,
                        ChessGame game) {
+
     @Override
     public String toString() {
         return ("Game ID: " + gameID +

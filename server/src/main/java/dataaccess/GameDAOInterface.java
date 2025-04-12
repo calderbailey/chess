@@ -2,11 +2,14 @@ package dataaccess;
 
 import exceptionhandling.DataAccessException;
 import model.GameData;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface GameDAOInterface {
     Integer createGame(String gameName) throws DataAccessException;
     GameData getGame(Integer gameID) throws DataAccessException;
+    void setGame(Integer gameID, GameData gameData) throws DataAccessException, SQLException;
     void clear() throws DataAccessException;
     Integer createGameID() throws DataAccessException;
     ArrayList<GameData> getGameList() throws DataAccessException;

@@ -52,7 +52,7 @@ public class PostLoginRepl {
                 printPrompt();
                 break;
             case "join":
-                new GamePlayRepl(serverUrl, userInput, "Playing").initiate();
+                new GamePlayRepl(serverUrl, userInput, "Playing", null).initiate();
                 break;
             case "observe":
                 JoinObserveResult observeResult = client.observe(userInput);

@@ -3,6 +3,8 @@ package server.websocket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.commands.CustomUserGameCommandSerializer;
+import websocket.commands.UserGameCommand;
 import websocket.messages.CustomServerMessageSerializer;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;

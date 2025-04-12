@@ -12,13 +12,13 @@ import java.util.Objects;
  */
 public class UserGameCommand {
 
-    private final CommandType commandType;
+    protected final CommandType commandType;
 
-    private final String authToken;
+    protected final String authToken;
 
-    private final Integer gameID;
+    protected final Integer gameID;
 
-    private final String teamColor;
+    protected final String teamColor;
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String teamColor) {
         this.commandType = commandType;
@@ -52,9 +52,13 @@ public class UserGameCommand {
 
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return "UserGameCommand{" +
+                "commandType=" + commandType +
+                ", authToken='" + authToken + '\'' +
+                ", gameID=" + gameID +
+                ", teamColor='" + teamColor + '\'' +
+                '}';
     }
-
 
     @Override
     public boolean equals(Object o) {

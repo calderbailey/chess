@@ -9,6 +9,7 @@ import chess.ChessPosition;
 import exceptionhandling.DataAccessException;
 import model.GameData;
 import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -20,17 +21,20 @@ import static ui.EscapeSequences.*;
 
 public class GamePlayRepl implements NotificationHandler {
     private final String serverUrl;
-    private final ChessBoard board;
+    private ChessBoard board;
     private final String[] userInput;
     private static final String LETTERS= " abcdefgh ";
     private static final Map<Character, Integer> COLUMN_MAP;
+    private static final Map<Character, PieceType> TYPE_MAP;
     private boolean proceed = true;
     private final String playerStatus;
     private GameData gameData;
     private final ChessClient client;
     private String teamColor;
+    private WebSocketFacade ws;
 
-    public GamePlayRepl(String serverUrl, String[] userInput, String playerStatus) {
+
+    public GamePlayRepl(String serverUrl, String[] userInput, String playerStatus, WebSocketFacade ws) {
         this.serverUrl = serverUrl;
         board = new ChessBoard();
         board.resetBoard();
@@ -38,6 +42,7 @@ public class GamePlayRepl implements NotificationHandler {
         this.playerStatus = playerStatus;
         this.client = new ChessClient(serverUrl, this);
         this.teamColor = userInput[2];
+        this.ws = ws;
 
     }
 
@@ -51,6 +56,18 @@ public class GamePlayRepl implements NotificationHandler {
         COLUMN_MAP.put('f', 6);
         COLUMN_MAP.put('g', 7);
         COLUMN_MAP.put('h', 8);
+    }
+
+    static {
+        TYPE_MAP = new HashMap<>();
+        TYPE_MAP.put('r', PieceType.ROOK);
+        TYPE_MAP.put('n', PieceType.KNIGHT);
+        TYPE_MAP.put('b', PieceType.BISHOP);
+        TYPE_MAP.put('q', PieceType.QUEEN);
+    }
+
+    public void setWS(WebSocketFacade ws) {
+        this.ws = ws;
     }
 
     public void initiate() throws DataAccessException {
@@ -85,7 +102,7 @@ public class GamePlayRepl implements NotificationHandler {
         int expectedArgs = switch (arguments[0].toLowerCase()) {
             case "redraw", "leave", "resign", "help" -> 1;
             case "highlight" -> 3;
-            case "makemove" -> 4;
+            case "makemove" -> 5;
             default -> throw new IllegalArgumentException("Unknown command: " + arguments[0]);
         };
         if (actualArgs != expectedArgs) {
@@ -106,7 +123,7 @@ public class GamePlayRepl implements NotificationHandler {
                 if (playerStatus == "Observing") {
                     throw new DataAccessException("ERROR: you cannot make a move as an observer", 500);
                 }
-                System.out.print("makeMove command \n");
+                makeMove(userInput);
                 break;
             case "resign":
                 if (playerStatus == "Observing") {
@@ -123,13 +140,76 @@ public class GamePlayRepl implements NotificationHandler {
         }
     }
 
+    private void makeMove(String[] userInput) throws DataAccessException {
+        checkInputMakeMove(userInput);
+        int startRow = Integer.parseInt(userInput[1]);
+        char startCol = userInput[2].charAt(0);
+        int endRow = Integer.parseInt(userInput[3]);
+        char endCol = userInput[4].charAt(0);
+        ChessPosition startPosition = createChessPosition(startRow, startCol);
+        ChessPosition endPosition = createChessPosition(endRow, endCol);
+        if (startPosition.equals(endPosition)) {
+            throw new DataAccessException("ERROR: invalid move", 500);
+        }
+        PieceType promoPiece = checkPromotion(startPosition, endPosition);
+        ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
+        ws.makeMove(move);
+    }
+
+    private PieceType checkPromotion(ChessPosition startPosition, ChessPosition endPosition) throws DataAccessException {
+        PieceType pieceType = board.getPiece(startPosition).getPieceType();
+        if ((endPosition.getRow() == 1 || endPosition.getRow() == 8) &&
+                (pieceType.equals(PieceType.PAWN))) {
+            System.out.printf("Congratulations your pawn can be promoted!\n" +
+                              "Please enter your selected promotion piece <R, N, B, Q>\n" +
+                              ">>> ");
+            Scanner scanner = new Scanner(System.in);
+            String[] userInput = parseInput(scanner.nextLine());
+            char promoPiece = userInput[0].toLowerCase().charAt(0);
+            checkPromoInput(userInput);
+            PieceType promoPieceType = TYPE_MAP.get(promoPiece);
+            return promoPieceType;
+        }
+        return null;
+    }
+
+    private void checkPromoInput(String[] userInput) throws DataAccessException {
+        char type = userInput[0].toLowerCase().charAt(0);
+        List<Character> typeList = List.of('r', 'n', 'b', 'q');
+        if (!typeList.contains(type)) {
+            throw new DataAccessException("ERROR: invalid promotion type", 500);
+        }
+    }
+
+    private void checkInputMakeMove(String[] fullUserInput) throws DataAccessException {
+        String[] userInput = Arrays.copyOfRange(fullUserInput, 1,5);
+        for (String arg : userInput) {
+            if (arg.length() != 1) {
+                throw new DataAccessException("ERROR: invalid input", 500);
+            }
+        }
+        if (!LETTERS.contains(userInput[1]) || !LETTERS.contains(userInput[3])) {
+            throw new DataAccessException("ERROR: valid column values are a-h", 500);
+        }
+        int startRow = Integer.parseInt(userInput[0]);
+        int endRow = Integer.parseInt(userInput[2]);
+        if (!(startRow >= 1 && startRow <= 8 && endRow >= 1 && endRow <= 8)) {
+            throw new DataAccessException("ERROR: valid row values are 1-8", 500);
+        }
+    }
+
+    private ChessPosition createChessPosition(int row, char col) {
+        int colInt = COLUMN_MAP.get(col);
+        return new ChessPosition(row, colInt);
+    }
+
     private void redraw() {
         printBoard(null);
     }
 
     private void highlight(String[] userInput) throws DataAccessException {
-        ArrayList<Integer> formattedArgs = highlightArgFormatter(userInput);
-        ChessPosition position = new ChessPosition(formattedArgs.get(0), formattedArgs.get(1));
+        highlightArgChecker(userInput);
+        ChessPosition position = createChessPosition(Integer.parseInt(userInput[1]), userInput[2].charAt(0));
         ChessPiece piece = board.getPiece(position);
         if (piece != null) {
             Collection <ChessMove> possibleMoves = piece.pieceMoves(board, position);
@@ -144,7 +224,7 @@ public class GamePlayRepl implements NotificationHandler {
         }
     }
 
-    private ArrayList<Integer> highlightArgFormatter(String[] userInput) throws DataAccessException {
+    private void highlightArgChecker(String[] userInput) throws DataAccessException {
         int row;
         try {
             row = Integer.parseInt(userInput[1]);
@@ -163,15 +243,6 @@ public class GamePlayRepl implements NotificationHandler {
         } catch (Exception e) {
             throw new DataAccessException("ERROR: col value must be a letter between a and h", 405);
         }
-        int colInt = COLUMN_MAP.get(col);
-        if (teamColor.equalsIgnoreCase("BLACK")) {
-            row = 9-row;
-            colInt = 9-colInt;
-        }
-        ArrayList<Integer> formattedInput = new ArrayList<>();
-        formattedInput.add(row);
-        formattedInput.add(colInt);
-        return formattedInput;
     }
 
     private void printBoard(Set<ChessPosition> highlightSquares){
@@ -184,24 +255,24 @@ public class GamePlayRepl implements NotificationHandler {
     private char[] chessboardToCharacterArray(){
         StringBuilder chessString = new StringBuilder();
         chessString.append(LETTERS);
-        int row = 1;
-        int col = 1;
-        while (row <= 8) {
+        int row = 8;
+        int col = 8;
+        while (row >= 1) {
             StringBuilder rowString = new StringBuilder();
-            rowString.append(9-row);
-            while (col <= 8) {
+            rowString.append(row);
+            while (col >= 1) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 if (piece == null) {
                     rowString.append(" ");
                 } else {
                     rowString.append(pieceToSymbol(board.getPiece(new ChessPosition(row, col))));
                 }
-                col ++;
+                col --;
             }
-            rowString.append(9-row);
+            rowString.append(row);
             chessString.append(rowString);
-            row ++;
-            col = 1;
+            row --;
+            col = 8;
         }
         chessString.append(LETTERS);
         return chessString.toString().toCharArray();
@@ -289,7 +360,7 @@ public class GamePlayRepl implements NotificationHandler {
     private String boarderRowMaker(char[] rowChars) {
         StringBuilder rowString = new StringBuilder();
         int index = 0;
-        while (index <10) {
+        while (index <= 9) {
             rowString.append(boarderSquare(rowChars[index]));
             index ++;
         }
@@ -299,17 +370,18 @@ public class GamePlayRepl implements NotificationHandler {
 
     private String rowMaker(char[] rowChars, Integer row, String rowColor, Set<ChessPosition> highlightSquares) {
         StringBuilder rowString = new StringBuilder();
-        int index = 0;
+        int index = 9;
         rowString.append(boarderSquare(rowChars[index]));
-        index ++;
+        index --;
         String squareColor = rowColor;
         ChessPosition pos;
-        while (index <=8) {
+        while (index >=1) {
             pos = new ChessPosition(row, index);
             if (highlightSquares != null && highlightSquares.contains(pos)) {
                 ChessPosition initialPos = highlightSquares.iterator().next();
                 if (pos.equals(initialPos)) {
                     rowString.append(initialSquare(rowChars[index], squareColor));
+                    squareColor = squareColorSwap(squareColor);
                 } else {
                     rowString.append(highlightedSquare(rowChars[index], squareColor));
                     squareColor = squareColorSwap(squareColor);
@@ -321,7 +393,7 @@ public class GamePlayRepl implements NotificationHandler {
                 rowString.append(blackSquare(rowChars[index]));
                 squareColor = squareColorSwap(squareColor);
             }
-            index ++;
+            index --;
         }
         rowString.append(boarderSquare(rowChars[index]));
         rowString.append(newLine());
@@ -378,7 +450,7 @@ public class GamePlayRepl implements NotificationHandler {
                 SET_TEXT_COLOR_MAGENTA + "- chess board\n" +
                 SET_TEXT_COLOR_BLUE + "leave " +
                 SET_TEXT_COLOR_MAGENTA + "- game\n" +
-                SET_TEXT_COLOR_BLUE + "makeMove <ChessMove>\n" +
+                SET_TEXT_COLOR_BLUE + "makeMove <StartRow> <StartColumn> <EndRow> <EndColumn>" +
                 SET_TEXT_COLOR_BLUE + "resign " +
                 SET_TEXT_COLOR_MAGENTA + "- from game\n" +
                 SET_TEXT_COLOR_BLUE + "highlight <Row> <Col> " +
@@ -401,6 +473,7 @@ public class GamePlayRepl implements NotificationHandler {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
                 gameData = ((LoadGameMessage) message).getGame();
+                board = gameData.game().getBoard();
                 redraw();
                 printPrompt();
             }
