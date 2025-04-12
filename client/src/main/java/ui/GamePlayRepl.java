@@ -209,7 +209,9 @@ public class GamePlayRepl implements NotificationHandler {
 
     private void highlight(String[] userInput) throws DataAccessException {
         highlightArgChecker(userInput);
-        ChessPosition position = createChessPosition(Integer.parseInt(userInput[1]), userInput[2].charAt(0));
+        int row = Integer.parseInt(userInput[1]);
+        char col = userInput[2].charAt(0);
+        ChessPosition position = createChessPosition(row, col);
         ChessPiece piece = board.getPiece(position);
         if (piece != null) {
             Collection <ChessMove> possibleMoves = piece.pieceMoves(board, position);
@@ -376,7 +378,7 @@ public class GamePlayRepl implements NotificationHandler {
         String squareColor = rowColor;
         ChessPosition pos;
         while (index >=1) {
-            pos = new ChessPosition(row, index);
+            pos = new ChessPosition(9-row, index);
             if (highlightSquares != null && highlightSquares.contains(pos)) {
                 ChessPosition initialPos = highlightSquares.iterator().next();
                 if (pos.equals(initialPos)) {
