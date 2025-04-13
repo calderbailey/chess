@@ -172,6 +172,28 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
         }
     }
 
+    public void removePlayer(String playerColor, Integer gameID) throws DataAccessException {
+        GameData game = getGame(gameID);
+        GameData updatedGame = null;
+
+        if (playerColor.equals("WHITE")) {
+            updatedGame = new GameData(gameID, null, game.blackUsername(), game.gameName(), game.game());
+        } else if (playerColor.equals("BLACK")) {
+            updatedGame = new GameData(gameID, game.whiteUsername(), null, game.gameName(), game.game());
+        }
+
+        String gameJson = new Gson().toJson(updatedGame, GameData.class);
+        String statement = "UPDATE games SET jsonGameData = ? WHERE gameID = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, gameJson);
+            ps.setInt(2, gameID);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Error: Unable to read data: %s", e.getMessage()), 400);
+        }
+    }
+
     @Override
     protected final String[] getCreateStatements() {
         return new String[]{

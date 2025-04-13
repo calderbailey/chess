@@ -80,11 +80,11 @@ public class GamePlayRepl implements NotificationHandler {
     public void run(){
         Scanner scanner = new Scanner(System.in);
         while (proceed) {
+            printPrompt();
             String[] userInput = parseInput(scanner.nextLine());
             try {
                 checkInput(userInput);
                 eval(userInput);
-                printPrompt();
             } catch (Throwable e) {
                 var msg = e.getMessage();
                 System.out.print("\n" + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n");
@@ -92,6 +92,7 @@ public class GamePlayRepl implements NotificationHandler {
                 printPrompt();
             }
         }
+        new PostLoginRepl(serverUrl).run();
         System.exit(1);
     }
 
@@ -119,7 +120,7 @@ public class GamePlayRepl implements NotificationHandler {
                 redraw();
                 break;
             case "leave":
-                System.out.print("leave command \n");
+                leave();
                 break;
             case "makemove":
                 if (playerStatus == "Observing") {
@@ -140,6 +141,11 @@ public class GamePlayRepl implements NotificationHandler {
                 System.out.printf(help());
                 break;
         }
+    }
+
+    private void leave() throws DataAccessException {
+        ws.leave();
+        proceed = false;
     }
 
     private void makeMove(String[] userInput) throws DataAccessException {

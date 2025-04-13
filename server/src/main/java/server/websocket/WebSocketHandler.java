@@ -68,7 +68,16 @@ public class WebSocketHandler {
                         makeMoveCommand.getMove(),
                         session);
             }
+            case LEAVE -> leave(command.getAuthToken(), command.getTeamColor(), command.getGameID());
         }
+    }
+
+    private void leave(String authToken, String playerColor, int gameID) throws DataAccessException, IOException {
+        GAMEDAO.removePlayer(playerColor, gameID);
+        String username = AUTHDAO.getAuth(authToken).username();
+        NotificationMessage broadcastNotification = new NotificationMessage(
+                username + " has left the game");
+        connections.broadcast(authToken, gameID, broadcastNotification);
     }
 
     private void connect(String teamColor, int gameID, String authToken, Session session) throws IOException, DataAccessException {
