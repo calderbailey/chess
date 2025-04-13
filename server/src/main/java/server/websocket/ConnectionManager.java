@@ -6,6 +6,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.CustomUserGameCommandSerializer;
 import websocket.commands.UserGameCommand;
 import websocket.messages.CustomServerMessageSerializer;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -41,7 +42,7 @@ public class ConnectionManager {
             Connection connection = connections.get(c);
             if (connection.session.isOpen()) {
                 if (connection.gameID == gameID && !Objects.equals(c, excludeAuthToken)) {
-                    connection.send(gson.toJson(notification, NotificationMessage.class));
+                    connection.send(gson.toJson(notification, ServerMessage.class));
                 }
             } else {
                 removeList.add(c);

@@ -17,6 +17,8 @@ import websocket.messages.ServerMessage;
 
 import java.util.*;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
 
 public class GamePlayRepl implements NotificationHandler {
@@ -158,17 +160,18 @@ public class GamePlayRepl implements NotificationHandler {
 
     private PieceType checkPromotion(ChessPosition startPosition, ChessPosition endPosition) throws DataAccessException {
         PieceType pieceType = board.getPiece(startPosition).getPieceType();
-        if ((endPosition.getRow() == 1 || endPosition.getRow() == 8) &&
-                (pieceType.equals(PieceType.PAWN))) {
-            System.out.printf("Congratulations your pawn can be promoted!\n" +
-                              "Please enter your selected promotion piece <R, N, B, Q>\n" +
-                              ">>> ");
-            Scanner scanner = new Scanner(System.in);
-            String[] userInput = parseInput(scanner.nextLine());
-            char promoPiece = userInput[0].toLowerCase().charAt(0);
-            checkPromoInput(userInput);
-            PieceType promoPieceType = TYPE_MAP.get(promoPiece);
-            return promoPieceType;
+        if (pieceType.equals(PieceType.PAWN)) {
+            if ((teamColor.equals(WHITE) && endPosition.getRow() == 1) || (teamColor.equals(BLACK) && endPosition.getRow() == 8)) {
+                System.out.printf("Congratulations your pawn can be promoted!\n" +
+                        "Please enter your selected promotion piece <R, N, B, Q>\n" +
+                        ">>> ");
+                Scanner scanner = new Scanner(System.in);
+                String[] userInput = parseInput(scanner.nextLine());
+                char promoPiece = userInput[0].toLowerCase().charAt(0);
+                checkPromoInput(userInput);
+                PieceType promoPieceType = TYPE_MAP.get(promoPiece);
+                return promoPieceType;
+            }
         }
         return null;
     }
@@ -205,6 +208,15 @@ public class GamePlayRepl implements NotificationHandler {
 
     private void redraw() {
         printBoard(null);
+        System.out.printf(SET_TEXT_COLOR_RED +
+                        ">>>  " +
+                        "It's the " +
+                        gameData.game().getTeamTurn().toString().toLowerCase() +
+                        " team's turn" +
+                        "  <<<" +
+                        RESET_TEXT_COLOR +
+                        "\n\n");
+        printPrompt();
     }
 
     private void highlight(String[] userInput) throws DataAccessException {
@@ -305,7 +317,7 @@ public class GamePlayRepl implements NotificationHandler {
         PieceType type = piece.getPieceType();
         TeamColor color = piece.getTeamColor();
 
-        if (color.equals(TeamColor.WHITE)) {
+        if (color.equals(WHITE)) {
             switch (type) {
                 case KING: return WHITE_KING;
                 case QUEEN: return WHITE_QUEEN;
@@ -448,11 +460,11 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     private String help() {
-        return (SET_TEXT_COLOR_BLUE + "redraw <NAME> " +
+        return (SET_TEXT_COLOR_BLUE + "redraw " +
                 SET_TEXT_COLOR_MAGENTA + "- chess board\n" +
                 SET_TEXT_COLOR_BLUE + "leave " +
                 SET_TEXT_COLOR_MAGENTA + "- game\n" +
-                SET_TEXT_COLOR_BLUE + "makeMove <StartRow> <StartColumn> <EndRow> <EndColumn>" +
+                SET_TEXT_COLOR_BLUE + "makeMove <StartRow> <StartColumn> <EndRow> <EndColumn> \n" +
                 SET_TEXT_COLOR_BLUE + "resign " +
                 SET_TEXT_COLOR_MAGENTA + "- from game\n" +
                 SET_TEXT_COLOR_BLUE + "highlight <Row> <Col> " +
@@ -477,15 +489,16 @@ public class GamePlayRepl implements NotificationHandler {
                 gameData = ((LoadGameMessage) message).getGame();
                 board = gameData.game().getBoard();
                 redraw();
-                printPrompt();
             }
             case NOTIFICATION -> {
                 String notice = ((NotificationMessage) message).getMessage();
                 System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + notice + "  <<<" + RESET_TEXT_COLOR + "\n");
+                printPrompt();
             }
             case ERROR -> {
                 String errorMessage = ((ErrorMessage) message).getErrorMessage();
                 System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + errorMessage + "  <<<" + RESET_TEXT_COLOR + "\n");
+                printPrompt();
             }
         }
     }

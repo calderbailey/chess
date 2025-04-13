@@ -18,6 +18,7 @@ import websocket.messages.*;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.util.HashMap;
 
 
 @WebSocket
@@ -37,6 +38,20 @@ public class WebSocketHandler {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static final HashMap<Object, Object> COLUMN_MAP;
+
+    static {
+        COLUMN_MAP = new HashMap<>();
+        COLUMN_MAP.put(1, 'a');
+        COLUMN_MAP.put(2, 'b');
+        COLUMN_MAP.put(3, 'c');
+        COLUMN_MAP.put(4, 'd');
+        COLUMN_MAP.put(5, 'e');
+        COLUMN_MAP.put(6, 'f');
+        COLUMN_MAP.put(7, 'g');
+        COLUMN_MAP.put(8, 'h');
     }
 
     private final ConnectionManager connections = new ConnectionManager();
@@ -65,20 +80,73 @@ public class WebSocketHandler {
             LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
             connections.send(authToken, notification);
             String username = AUTHDAO.getAuth(authToken).username();
-            NotificationMessage broadcastNotification = new NotificationMessage(username + " has entered the game as the " + teamColor + " player");
+            NotificationMessage broadcastNotification = new NotificationMessage(
+                    username + " has entered the game as the " + teamColor + " player");
             connections.broadcast(authToken, gameID, broadcastNotification);
         }
     }
 
-    private void makeMove(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, InvalidMoveException {
+    private void makeMove(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, InvalidMoveException, IOException {
         GameData gameData = GAMEDAO.getGame(gameID);
         try {
             gameData.game().makeMove(move);
             GAMEDAO.setGame(gameID, gameData);
+            String username = AUTHDAO.getAuth(authToken).username();
+            String moveDescription = username + " moved " + "(" + move.getStartPosition().getRow() + ", " +
+                    COLUMN_MAP.get(move.getStartPosition().getColumn()) + ")" +
+                    " to  (" + move.getEndPosition().getRow() + ", " +
+                    COLUMN_MAP.get(move.getEndPosition().getRow()) + ")";
+            NotificationMessage moveMessage = new NotificationMessage(moveDescription);
+            connections.broadcast(null, gameID, moveMessage);
             LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
             connections.send(authToken, notification);
+            connections.broadcast(authToken, gameID, notification);
+            inCheckTracker(gameData);
         } catch (Exception ex) {
-            System.out.print(ex.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage("Invalid move");
+            connections.send(authToken, errorMessage);
         }
+    }
+
+    private void inCheckTracker (GameData gameData) throws IOException {
+        ChessGame.TeamColor teamInCheck = null;
+        String username = null;
+        if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+            teamInCheck = ChessGame.TeamColor.BLACK;
+            username = gameData.blackUsername();
+        } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+            teamInCheck = ChessGame.TeamColor.WHITE;
+            username = gameData.whiteUsername();
+        } else {
+            return;
+        }
+        if (!checkMateTracker(gameData, teamInCheck)) {
+            String notification = username + " is in check";
+            NotificationMessage notificationMessage = new NotificationMessage(notification);
+            connections.broadcast(null, gameData.gameID(), notificationMessage);
+        }
+
+    }
+
+    private boolean checkMateTracker (GameData gameData, ChessGame.TeamColor teamColor) throws IOException {
+        if (gameData.game().isInCheckmate(teamColor)) {
+            String winnerUsername = null;
+            String loserUsername = null;
+            switch (teamColor) {
+                case WHITE -> {
+                    loserUsername = gameData.whiteUsername();
+                    winnerUsername = gameData.blackUsername();
+                }
+                case BLACK -> {
+                    loserUsername = gameData.blackUsername();
+                    winnerUsername = gameData.whiteUsername();
+                }
+            }
+            String notification = loserUsername + " is in checkmate: " + winnerUsername + " wins!";
+            NotificationMessage notificationMessage = new NotificationMessage(notification);
+            connections.broadcast(null, gameData.gameID(), notificationMessage);
+            return true;
+        }
+        return false;
     }
 }
