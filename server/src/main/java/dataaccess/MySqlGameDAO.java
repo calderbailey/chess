@@ -175,8 +175,9 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAOInterface {
     public void removePlayer(String playerColor, Integer gameID) throws DataAccessException {
         GameData game = getGame(gameID);
         GameData updatedGame = null;
-
-        if (playerColor.equals("WHITE")) {
+        if (playerColor == null) {
+            return;
+        } else if (playerColor.equals("WHITE")) {
             updatedGame = new GameData(gameID, null, game.blackUsername(), game.gameName(), game.game());
         } else if (playerColor.equals("BLACK")) {
             updatedGame = new GameData(gameID, game.whiteUsername(), null, game.gameName(), game.game());

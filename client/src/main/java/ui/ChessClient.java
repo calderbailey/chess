@@ -125,7 +125,7 @@ public class ChessClient{
         } catch (Exception e) {
             throw new DataAccessException("ERROR: invalid game ID", 500);
         }
-        String teamColor = "WHITE";
+        String teamColor = null;
         ws = new WebSocketFacade(serverUrl, gamePlayRepl, teamColor);
         gamePlayRepl.setWS(ws);
         ws.connect(authToken, gameID);

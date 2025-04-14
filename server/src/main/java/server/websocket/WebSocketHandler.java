@@ -123,8 +123,14 @@ public class WebSocketHandler {
             LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
             connections.send(authToken, notification);
             String username = AUTHDAO.getAuth(authToken).username();
-            NotificationMessage broadcastNotification = new NotificationMessage(
-                    username + " has entered the game as the " + teamColor + " player");
+            NotificationMessage broadcastNotification;
+            if (teamColor != null) {
+                broadcastNotification = new NotificationMessage(
+                        username + " has entered the game as the " + teamColor + " player");
+            } else {
+                broadcastNotification = new NotificationMessage(
+                        username + " has entered the game as an OBSERVER");
+            }
             connections.broadcast(authToken, gameID, broadcastNotification);
         }
     }
@@ -151,7 +157,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void inCheckTracker (GameData gameData) throws IOException {
+    private void inCheckTracker (GameData gameData) throws IOException, SQLException, DataAccessException {
         ChessGame.TeamColor teamInCheck = null;
         String username = null;
         if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
@@ -171,7 +177,7 @@ public class WebSocketHandler {
 
     }
 
-    private boolean checkMateTracker (GameData gameData, ChessGame.TeamColor teamColor) throws IOException {
+    private boolean checkMateTracker (GameData gameData, ChessGame.TeamColor teamColor) throws IOException, SQLException, DataAccessException {
         if (gameData.game().isInCheckmate(teamColor)) {
             String winnerUsername = null;
             String loserUsername = null;
@@ -185,10 +191,21 @@ public class WebSocketHandler {
                     winnerUsername = gameData.whiteUsername();
                 }
             }
-            gameData.game().setGameComplete();
+            ChessGame game = gameData.game();
+            game.setGameComplete();
+            GameData updatedGame = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    game
+            );
+            GAMEDAO.setGame(gameData.gameID(), updatedGame);
             String notification = loserUsername + " is in checkmate: " + winnerUsername + " wins!";
             NotificationMessage notificationMessage = new NotificationMessage(notification);
             connections.broadcast(null, gameData.gameID(), notificationMessage);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
+            connections.broadcast(null, gameData.gameID(), loadGameMessage);
             return true;
         }
         return false;

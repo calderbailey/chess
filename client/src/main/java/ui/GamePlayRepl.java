@@ -154,7 +154,11 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     private void leave() throws DataAccessException {
-        ws.leave();
+        try {
+            ws.leave();
+        } catch (Exception ex) {
+            System.out.printf(ex.getMessage());
+        }
         proceed = false;
     }
 
