@@ -147,17 +147,18 @@ public class WebSocketHandler {
                     COLUMN_MAP.get(move.getEndPosition().getRow()) + ")";
             NotificationMessage moveMessage = new NotificationMessage(moveDescription);
             connections.broadcast(authToken, gameID, moveMessage);
-            LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
-            connections.send(authToken, notification);
-            connections.broadcast(authToken, gameID, notification);
-            inCheckTracker(gameData);
+            if (!inCheckTracker(gameData) && !stalemateTracker(gameData)) {
+                LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
+                connections.send(authToken, notification);
+                connections.broadcast(authToken, gameID, notification);
+            }
         } catch (Exception ex) {
             ErrorMessage errorMessage = new ErrorMessage("Invalid move");
             connections.send(authToken, errorMessage);
         }
     }
 
-    private void inCheckTracker (GameData gameData) throws IOException, SQLException, DataAccessException {
+    private boolean inCheckTracker (GameData gameData) throws IOException, SQLException, DataAccessException {
         ChessGame.TeamColor teamInCheck = null;
         String username = null;
         if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
@@ -167,14 +168,15 @@ public class WebSocketHandler {
             teamInCheck = ChessGame.TeamColor.WHITE;
             username = gameData.whiteUsername();
         } else {
-            return;
+            return false;
         }
         if (!checkMateTracker(gameData, teamInCheck)) {
             String notification = username + " is in check";
             NotificationMessage notificationMessage = new NotificationMessage(notification);
             connections.broadcast(null, gameData.gameID(), notificationMessage);
+            return false;
         }
-
+        return true;
     }
 
     private boolean checkMateTracker (GameData gameData, ChessGame.TeamColor teamColor) throws IOException, SQLException, DataAccessException {
@@ -211,8 +213,8 @@ public class WebSocketHandler {
         return false;
     }
 
-    private boolean stalemateTracker (GameData gameData, ChessGame.TeamColor teamColor) throws IOException, SQLException, DataAccessException {
-        if (gameData.game().isInStalemate(teamColor)) {
+    private boolean stalemateTracker (GameData gameData) throws IOException, SQLException, DataAccessException {
+        if (gameData.game().isInStalemate(ChessGame.TeamColor.WHITE) || gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
             ChessGame game = gameData.game();
             game.setGameComplete();
             GameData updatedGame = new GameData(
