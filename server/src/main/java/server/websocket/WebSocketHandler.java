@@ -210,4 +210,26 @@ public class WebSocketHandler {
         }
         return false;
     }
+
+    private boolean stalemateTracker (GameData gameData, ChessGame.TeamColor teamColor) throws IOException, SQLException, DataAccessException {
+        if (gameData.game().isInStalemate(teamColor)) {
+            ChessGame game = gameData.game();
+            game.setGameComplete();
+            GameData updatedGame = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    game
+            );
+            GAMEDAO.setGame(gameData.gameID(), updatedGame);
+            String notification = "Game is in a stalemate: no winner";
+            NotificationMessage notificationMessage = new NotificationMessage(notification);
+            connections.broadcast(null, gameData.gameID(), notificationMessage);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
+            connections.broadcast(null, gameData.gameID(), loadGameMessage);
+            return true;
+        }
+        return false;
+    }
 }
