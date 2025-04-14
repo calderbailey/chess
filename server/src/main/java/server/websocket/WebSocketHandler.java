@@ -73,7 +73,7 @@ public class WebSocketHandler {
                         makeMoveCommand.getMove(),
                         session);
             }
-            case LEAVE -> leave(command.getAuthToken(), command.getTeamColor(), command.getGameID());
+            case LEAVE -> leave(command.getAuthToken(), command.getGameID());
             case RESIGN -> resign(command.getAuthToken(), command.getGameID());
         }
     }
@@ -86,9 +86,16 @@ public class WebSocketHandler {
         }
     }
 
-    private void leave(String authToken, String playerColor, int gameID) throws DataAccessException, IOException, SQLException {
-        GAMEDAO.removePlayer(playerColor, gameID);
+    private void leave(String authToken, int gameID) throws DataAccessException, IOException, SQLException {
+        GameData gameData = GAMEDAO.getGame(gameID);
         String username = AUTHDAO.getAuth(authToken).username();
+        String playerColor = null;
+        if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
+            playerColor = "BLACK";
+        } else if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
+            playerColor = "WHITE";
+        }
+        GAMEDAO.removePlayer(playerColor, gameID);
         NotificationMessage broadcastNotification = new NotificationMessage(
                 username + " has left the game");
         connections.broadcast(authToken, gameID, broadcastNotification);
