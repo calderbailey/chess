@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptionhandling.DataAccessException;
 import model.GameData;
@@ -55,9 +56,7 @@ public class PostLoginRepl {
                 new GamePlayRepl(serverUrl, userInput, "Playing", null).initiate();
                 break;
             case "observe":
-                JoinObserveResult observeResult = client.observe(userInput);
-                System.out.printf(observeResult.gamePrintString());
-//                new GamePlayRepl(serverUrl, "WHITE", "Observing").run();
+                new GamePlayRepl(serverUrl, userInput, "Observing", null).initiate();
                 break;
             case "logout":
                 System.out.print("\n");

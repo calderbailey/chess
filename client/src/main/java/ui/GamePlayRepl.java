@@ -43,9 +43,12 @@ public class GamePlayRepl implements NotificationHandler {
         this.userInput = userInput;
         this.playerStatus = playerStatus;
         this.client = new ChessClient(serverUrl, this);
-        this.teamColor = userInput[2];
+        if (playerStatus.equals("Playing")) {
+            this.teamColor = userInput[2];
+        } else {
+            this.teamColor = "WHITE";
+        }
         this.ws = ws;
-
     }
 
     static {
@@ -73,7 +76,11 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     public void initiate() throws DataAccessException {
-        client.join(userInput);
+        if (playerStatus.equals("Playing")) {
+            client.join(userInput);
+        } else {
+            client.observe(userInput);
+        }
         run();
     }
 
@@ -89,7 +96,6 @@ public class GamePlayRepl implements NotificationHandler {
                 var msg = e.getMessage();
                 System.out.print("\n" + "*** " + SET_TEXT_COLOR_RED + msg + RESET_TEXT_COLOR + " ***" + "\n");
                 System.out.print(help());
-                printPrompt();
             }
         }
         new PostLoginRepl(serverUrl).run();
@@ -123,13 +129,13 @@ public class GamePlayRepl implements NotificationHandler {
                 leave();
                 break;
             case "makemove":
-                if (playerStatus == "Observing") {
+                if (playerStatus.equals("Observing")) {
                     throw new DataAccessException("ERROR: you cannot make a move as an observer", 500);
                 }
                 makeMove(userInput);
                 break;
             case "resign":
-                if (playerStatus == "Observing") {
+                if (playerStatus.equals("Observing")) {
                     throw new DataAccessException("ERROR: you cannot resign as an observer", 500);
                 }
                 resign();
@@ -155,7 +161,6 @@ public class GamePlayRepl implements NotificationHandler {
     private void makeMove(String[] userInput) throws DataAccessException {
         if (gameData.game().isGameComplete()) {
             System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + "Game Completed" + "  <<<" + RESET_TEXT_COLOR + "\n");
-            printPrompt();
         } else {
             checkInputMakeMove(userInput);
             int startRow = Integer.parseInt(userInput[1]);
@@ -240,7 +245,6 @@ public class GamePlayRepl implements NotificationHandler {
                     RESET_TEXT_COLOR +
                     "\n\n");
         }
-        printPrompt();
     }
 
     private void highlight(String[] userInput) throws DataAccessException {
@@ -414,7 +418,9 @@ public class GamePlayRepl implements NotificationHandler {
         String squareColor = rowColor;
         ChessPosition pos;
         while (index >=1) {
-            pos = new ChessPosition(9-row, index);
+            int actualRow = teamColor.equalsIgnoreCase("WHITE") ? row : 9 - row;
+            int actualCol = teamColor.equalsIgnoreCase("BLACK") ? index : 9 - index;
+            pos = new ChessPosition(actualRow, actualCol);
             if (highlightSquares != null && highlightSquares.contains(pos)) {
                 ChessPosition initialPos = highlightSquares.iterator().next();
                 if (pos.equals(initialPos)) {
@@ -513,6 +519,7 @@ public class GamePlayRepl implements NotificationHandler {
                 gameData = ((LoadGameMessage) message).getGame();
                 board = gameData.game().getBoard();
                 redraw();
+                printPrompt();
             }
             case NOTIFICATION -> {
                 String notice = ((NotificationMessage) message).getMessage();
@@ -522,7 +529,6 @@ public class GamePlayRepl implements NotificationHandler {
             case ERROR -> {
                 String errorMessage = ((ErrorMessage) message).getErrorMessage();
                 System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + errorMessage + "  <<<" + RESET_TEXT_COLOR + "\n");
-                printPrompt();
             }
         }
     }

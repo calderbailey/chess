@@ -115,19 +115,20 @@ public class ChessClient{
         ws.connect(authToken, gameID);
     }
 
-    public JoinObserveResult observe(String[] userInput) throws DataAccessException {
+    public void observe(String[] userInput) throws DataAccessException {
         updateGameList();
+        Integer gameID;
         Integer gameNum;
         try {
             gameNum = Integer.parseInt(userInput[1]);
+            gameID = gameList.get(gameNum).gameID();
         } catch (Exception e) {
             throw new DataAccessException("ERROR: invalid game ID", 500);
         }
-        if (!gameList.containsKey(gameNum)) {
-            throw new DataAccessException("ERROR: game does not exist", 500);
-        }
-        JoinObserveResult result = new JoinObserveResult(gameToString(gameNum), gameList.get(gameNum));
-        return result;
+        String teamColor = "WHITE";
+        ws = new WebSocketFacade(serverUrl, gamePlayRepl, teamColor);
+        gamePlayRepl.setWS(ws);
+        ws.connect(authToken, gameID);
     }
 
     public String getUsername(){

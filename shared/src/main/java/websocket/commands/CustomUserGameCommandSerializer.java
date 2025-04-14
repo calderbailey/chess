@@ -40,21 +40,41 @@ public class CustomUserGameCommandSerializer implements JsonSerializer<UserGameC
 
         // Deserialize all commands but MakeMove
         if (!UserGameCommand.CommandType.MAKE_MOVE.equals(commandType)) {
+            String authToken = null;
+            JsonElement authTokenElement = jsonObject.get("authToken");
+            if (authTokenElement != null && !authTokenElement.isJsonNull()) {
+                authToken = authTokenElement.getAsString();
+            }
+            String teamColor = null;
+            JsonElement teamColorElement = jsonObject.get("teamColor");
+            if (teamColorElement != null && !teamColorElement.isJsonNull()) {
+                teamColor = teamColorElement.getAsString();
+            }
             UserGameCommand userGameCommand = new UserGameCommand(
                     commandType,
-                    jsonObject.get("authToken").getAsString(),
+                    authToken,
                     jsonObject.get("gameID").getAsInt(),
-                    jsonObject.get("teamColor").getAsString()
+                    teamColor
             );
             returnCommand = userGameCommand;
         }
 
         // Deserialize Make Move
         if (UserGameCommand.CommandType.MAKE_MOVE.equals(commandType)) {
+            String authToken = null;
+            JsonElement authTokenElement = jsonObject.get("authToken");
+            if (authTokenElement != null && !authTokenElement.isJsonNull()) {
+                authToken = authTokenElement.getAsString();
+            }
+            String teamColor = null;
+            JsonElement teamColorElement = jsonObject.get("teamColor");
+            if (teamColorElement != null && !teamColorElement.isJsonNull()) {
+                teamColor = teamColorElement.getAsString();
+            }
             MakeMoveCommand makeMoveCommand = new MakeMoveCommand(
-                    jsonObject.get("authToken").getAsString(),
+                    authToken,
                     jsonObject.get("gameID").getAsInt(),
-                    jsonObject.get("teamColor").getAsString(),
+                    teamColor,
                     null);
             // Deserialize the ChessMove object if it's present
             JsonElement moveElement = jsonObject.get("move");

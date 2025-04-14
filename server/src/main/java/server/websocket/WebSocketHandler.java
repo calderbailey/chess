@@ -140,7 +140,7 @@ public class WebSocketHandler {
                     " to  (" + move.getEndPosition().getRow() + ", " +
                     COLUMN_MAP.get(move.getEndPosition().getRow()) + ")";
             NotificationMessage moveMessage = new NotificationMessage(moveDescription);
-            connections.broadcast(null, gameID, moveMessage);
+            connections.broadcast(authToken, gameID, moveMessage);
             LoadGameMessage notification = new LoadGameMessage(GAMEDAO.getGame(gameID));
             connections.send(authToken, notification);
             connections.broadcast(authToken, gameID, notification);
