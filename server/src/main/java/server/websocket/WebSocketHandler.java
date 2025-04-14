@@ -74,7 +74,7 @@ public class WebSocketHandler {
                         session);
             }
             case LEAVE -> leave(command.getAuthToken(), command.getTeamColor(), command.getGameID());
-            case RESIGN -> resign(command.getAuthToken(), command.getTeamColor(), command.getGameID());
+            case RESIGN -> resign(command.getAuthToken(), command.getGameID());
         }
     }
 
@@ -87,43 +87,50 @@ public class WebSocketHandler {
     }
 
     private void leave(String authToken, String playerColor, int gameID) throws DataAccessException, IOException, SQLException {
-        GameData gameData = GAMEDAO.getGame(gameID);
         GAMEDAO.removePlayer(playerColor, gameID);
-        GAMEDAO.setGame(gameID, gameData);
-        GAMEDAO.removePlayer(playerColor, gameID);
-        GameData updatedGame = GAMEDAO.getGame(gameID);
-        GAMEDAO.setGame(gameID, updatedGame);
         String username = AUTHDAO.getAuth(authToken).username();
         NotificationMessage broadcastNotification = new NotificationMessage(
                 username + " has left the game");
         connections.broadcast(authToken, gameID, broadcastNotification);
+        connections.remove(authToken);
     }
 
-    private void resign(String authToken, String playerColor, int gameID) throws DataAccessException, IOException, SQLException {
-        GameData gameData = GAMEDAO.getGame(gameID);
-        ChessGame game = gameData.game();
-        game.setGameComplete();
-        GameData updatedGame = new GameData(
-                gameID,
-                gameData.whiteUsername(),
-                gameData.blackUsername(),
-                gameData.gameName(),
-                game
-        );
-        GAMEDAO.setGame(gameID, updatedGame);
-
+    private void resign(String authToken, int gameID) throws DataAccessException, IOException, SQLException {
         String loserUsername = AUTHDAO.getAuth(authToken).username();
-        String winnerUsername = null;
-        if (playerColor.equals("WHITE")) {
-            winnerUsername = GAMEDAO.getGame(gameID).blackUsername();
-        } else if (playerColor.equals("BLACK")) {
-            winnerUsername = GAMEDAO.getGame(gameID).whiteUsername();
+        GameData gameData = GAMEDAO.getGame(gameID);
+        if (gameData.game().isGameComplete()) {
+            ErrorMessage errorMessage = new ErrorMessage("Game complete");
+            connections.send(authToken, errorMessage);
+        } else {
+            String playerColor = null;
+            if (gameData.blackUsername().equals(loserUsername)) {
+                playerColor = "BLACK";
+            } else if (gameData.whiteUsername().equals(loserUsername)) {
+                playerColor = "WHITE";
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Observers cannot resign");
+                connections.send(authToken, errorMessage);
+            }
+            ChessGame game = gameData.game();
+            game.setGameComplete();
+            GameData updatedGame = new GameData(
+                    gameID,
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    game
+            );
+            GAMEDAO.setGame(gameID, updatedGame);
+            String winnerUsername = null;
+            if (playerColor.equals("WHITE")) {
+                winnerUsername = GAMEDAO.getGame(gameID).blackUsername();
+            } else if (playerColor.equals("BLACK")) {
+                winnerUsername = GAMEDAO.getGame(gameID).whiteUsername();
+            }
+            NotificationMessage broadcastNotification = new NotificationMessage(
+                    "Game completed: " + loserUsername + " has resigned and " + winnerUsername + " has won");
+            connections.broadcast(null, gameID, broadcastNotification);
         }
-        NotificationMessage broadcastNotification = new NotificationMessage(
-                "Game completed: " + loserUsername + " has resigned and " + winnerUsername + " has won" );
-        connections.broadcast(null, gameID, broadcastNotification);
-        LoadGameMessage loadGameMessage = new LoadGameMessage(GAMEDAO.getGame(gameID));
-        connections.broadcast(null, gameID, loadGameMessage);
     }
 
     private void connect(String teamColor, int gameID, String authToken, Session session) throws IOException, DataAccessException {
@@ -149,6 +156,10 @@ public class WebSocketHandler {
 
     private void makeMove(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, InvalidMoveException, IOException {
         GameData gameData = GAMEDAO.getGame(gameID);
+        if (gameData.game().isGameComplete()) {
+            ErrorMessage errorMessage = new ErrorMessage("Game Completed");
+            connections.send(authToken, errorMessage);
+        }
         try {
             checkAuthToken(gameData, authToken);
             ChessGame.TeamColor teamColor = null;
