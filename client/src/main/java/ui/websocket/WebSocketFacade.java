@@ -105,4 +105,13 @@ public class WebSocketFacade extends Endpoint {
             throw new DataAccessException(ex.getMessage(), 500);
         }
     }
+
+    public void resign() throws DataAccessException {
+        try {
+            UserGameCommand action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, getAuthToken(), getGameID(), getTeamColor());
+            session.getBasicRemote().sendText(gson.toJson(action));
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage(), 500);
+        }
+    }
 }

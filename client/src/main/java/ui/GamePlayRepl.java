@@ -132,7 +132,7 @@ public class GamePlayRepl implements NotificationHandler {
                 if (playerStatus == "Observing") {
                     throw new DataAccessException("ERROR: you cannot resign as an observer", 500);
                 }
-                System.out.print("resign command \n");
+                resign();
                 break;
             case "highlight":
                 highlight(userInput);
@@ -143,25 +143,34 @@ public class GamePlayRepl implements NotificationHandler {
         }
     }
 
+    private void resign() throws DataAccessException {
+        ws.resign();
+    }
+
     private void leave() throws DataAccessException {
         ws.leave();
         proceed = false;
     }
 
     private void makeMove(String[] userInput) throws DataAccessException {
-        checkInputMakeMove(userInput);
-        int startRow = Integer.parseInt(userInput[1]);
-        char startCol = userInput[2].charAt(0);
-        int endRow = Integer.parseInt(userInput[3]);
-        char endCol = userInput[4].charAt(0);
-        ChessPosition startPosition = createChessPosition(startRow, startCol);
-        ChessPosition endPosition = createChessPosition(endRow, endCol);
-        if (startPosition.equals(endPosition)) {
-            throw new DataAccessException("ERROR: invalid move", 500);
+        if (gameData.game().isGameComplete()) {
+            System.out.printf("\n" + SET_TEXT_COLOR_RED + ">>>  " + "Game Completed" + "  <<<" + RESET_TEXT_COLOR + "\n");
+            printPrompt();
+        } else {
+            checkInputMakeMove(userInput);
+            int startRow = Integer.parseInt(userInput[1]);
+            char startCol = userInput[2].charAt(0);
+            int endRow = Integer.parseInt(userInput[3]);
+            char endCol = userInput[4].charAt(0);
+            ChessPosition startPosition = createChessPosition(startRow, startCol);
+            ChessPosition endPosition = createChessPosition(endRow, endCol);
+            if (startPosition.equals(endPosition)) {
+                throw new DataAccessException("ERROR: invalid move", 500);
+            }
+            PieceType promoPiece = checkPromotion(startPosition, endPosition);
+            ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
+            ws.makeMove(move);
         }
-        PieceType promoPiece = checkPromotion(startPosition, endPosition);
-        ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
-        ws.makeMove(move);
     }
 
     private PieceType checkPromotion(ChessPosition startPosition, ChessPosition endPosition) throws DataAccessException {
@@ -214,14 +223,23 @@ public class GamePlayRepl implements NotificationHandler {
 
     private void redraw() {
         printBoard(null);
-        System.out.printf(SET_TEXT_COLOR_RED +
-                        ">>>  " +
-                        "It's the " +
-                        gameData.game().getTeamTurn().toString().toLowerCase() +
-                        " team's turn" +
-                        "  <<<" +
-                        RESET_TEXT_COLOR +
-                        "\n\n");
+        if (gameData.game().isGameComplete()) {
+            System.out.printf(SET_TEXT_COLOR_RED +
+                    ">>>  " +
+                    "Game Complete" +
+                    "  <<<" +
+                    RESET_TEXT_COLOR +
+                    "\n\n");
+        } else {
+            System.out.printf(SET_TEXT_COLOR_RED +
+                    ">>>  " +
+                    "It's the " +
+                    gameData.game().getTeamTurn().toString().toLowerCase() +
+                    " team's turn" +
+                    "  <<<" +
+                    RESET_TEXT_COLOR +
+                    "\n\n");
+        }
         printPrompt();
     }
 

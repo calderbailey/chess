@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame implements Cloneable{
     private ChessBoard gameBoard = new ChessBoard();
     private TeamColor teamTurn = TeamColor.WHITE;
+    private boolean gameComplete = false;
     private final Collection<ChessPosition> allPositions = new ArrayList<>();
     public ChessGame() {
         gameBoard.resetBoard();
@@ -21,6 +22,14 @@ public class ChessGame implements Cloneable{
                 allPositions.add(new ChessPosition(rowIndex, colIndex));
             }
         }
+    }
+
+    public boolean isGameComplete() {
+        return this.gameComplete;
+    }
+
+    public void setGameComplete() {
+        this.gameComplete = true;
     }
 
     /**

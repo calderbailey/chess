@@ -18,6 +18,7 @@ import websocket.messages.*;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 
@@ -57,7 +58,7 @@ public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, DataAccessException, InvalidMoveException {
+    public void onMessage(Session session, String message) throws IOException, DataAccessException, InvalidMoveException, SQLException {
         UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
             case CONNECT -> connect(command.getTeamColor(), command.getGameID(), command.getAuthToken(), session);
@@ -69,15 +70,48 @@ public class WebSocketHandler {
                         session);
             }
             case LEAVE -> leave(command.getAuthToken(), command.getTeamColor(), command.getGameID());
+            case RESIGN -> resign(command.getAuthToken(), command.getTeamColor(), command.getGameID());
         }
     }
 
-    private void leave(String authToken, String playerColor, int gameID) throws DataAccessException, IOException {
+    private void leave(String authToken, String playerColor, int gameID) throws DataAccessException, IOException, SQLException {
+        GameData gameData = GAMEDAO.getGame(gameID);
         GAMEDAO.removePlayer(playerColor, gameID);
+        GAMEDAO.setGame(gameID, gameData);
+        GAMEDAO.removePlayer(playerColor, gameID);
+        GameData updatedGame = GAMEDAO.getGame(gameID);
+        GAMEDAO.setGame(gameID, updatedGame);
         String username = AUTHDAO.getAuth(authToken).username();
         NotificationMessage broadcastNotification = new NotificationMessage(
                 username + " has left the game");
         connections.broadcast(authToken, gameID, broadcastNotification);
+    }
+
+    private void resign(String authToken, String playerColor, int gameID) throws DataAccessException, IOException, SQLException {
+        GameData gameData = GAMEDAO.getGame(gameID);
+        ChessGame game = gameData.game();
+        game.setGameComplete();
+        GameData updatedGame = new GameData(
+                gameID,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                game
+        );
+        GAMEDAO.setGame(gameID, updatedGame);
+
+        String loserUsername = AUTHDAO.getAuth(authToken).username();
+        String winnerUsername = null;
+        if (playerColor.equals("WHITE")) {
+            winnerUsername = GAMEDAO.getGame(gameID).blackUsername();
+        } else if (playerColor.equals("BLACK")) {
+            winnerUsername = GAMEDAO.getGame(gameID).whiteUsername();
+        }
+        NotificationMessage broadcastNotification = new NotificationMessage(
+                "Game completed: " + loserUsername + " has resigned and " + winnerUsername + " has won" );
+        connections.broadcast(null, gameID, broadcastNotification);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(GAMEDAO.getGame(gameID));
+        connections.broadcast(null, gameID, loadGameMessage);
     }
 
     private void connect(String teamColor, int gameID, String authToken, Session session) throws IOException, DataAccessException {
@@ -151,6 +185,7 @@ public class WebSocketHandler {
                     winnerUsername = gameData.whiteUsername();
                 }
             }
+            gameData.game().setGameComplete();
             String notification = loserUsername + " is in checkmate: " + winnerUsername + " wins!";
             NotificationMessage notificationMessage = new NotificationMessage(notification);
             connections.broadcast(null, gameData.gameID(), notificationMessage);
