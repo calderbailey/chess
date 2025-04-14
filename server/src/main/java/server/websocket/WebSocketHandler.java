@@ -16,7 +16,6 @@ import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -63,6 +62,11 @@ public class WebSocketHandler {
         switch (command.getCommandType()) {
             case CONNECT -> connect(command.getTeamColor(), command.getGameID(), command.getAuthToken(), session);
             case MAKE_MOVE -> {
+                if (checkAuth(command.getAuthToken()) == true) {
+                } else {
+                    ErrorMessage errorMessage = new ErrorMessage("unauthorized");
+                    session.getRemote().sendString(gson.toJson(errorMessage, ServerMessage.class));
+                }
                 MakeMoveCommand makeMoveCommand = ((MakeMoveCommand) command);
                 makeMove(makeMoveCommand.getGameID(),
                         makeMoveCommand.getAuthToken(),
@@ -71,6 +75,14 @@ public class WebSocketHandler {
             }
             case LEAVE -> leave(command.getAuthToken(), command.getTeamColor(), command.getGameID());
             case RESIGN -> resign(command.getAuthToken(), command.getTeamColor(), command.getGameID());
+        }
+    }
+
+    private boolean checkAuth(String authToken) throws IOException, DataAccessException {
+        if (AUTHDAO.getAuth(authToken) == null) {
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -138,9 +150,19 @@ public class WebSocketHandler {
     private void makeMove(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, InvalidMoveException, IOException {
         GameData gameData = GAMEDAO.getGame(gameID);
         try {
+            checkAuthToken(gameData, authToken);
+            ChessGame.TeamColor teamColor = null;
+            String username = AUTHDAO.getAuth(authToken).username();
+            if (username.equals(GAMEDAO.getGame(gameID).blackUsername())) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            } else {
+                teamColor = ChessGame.TeamColor.WHITE;
+            }
+            if (!teamColor.equals(GAMEDAO.getGame(gameID).game().getTeamTurn())) {
+                throw new InvalidMoveException();
+            }
             gameData.game().makeMove(move);
             GAMEDAO.setGame(gameID, gameData);
-            String username = AUTHDAO.getAuth(authToken).username();
             String moveDescription = username + " moved " + "(" + move.getStartPosition().getRow() + ", " +
                     COLUMN_MAP.get(move.getStartPosition().getColumn()) + ")" +
                     " to  (" + move.getEndPosition().getRow() + ", " +
@@ -155,6 +177,17 @@ public class WebSocketHandler {
         } catch (Exception ex) {
             ErrorMessage errorMessage = new ErrorMessage("Invalid move");
             connections.send(authToken, errorMessage);
+        }
+    }
+
+    private void checkAuthToken(GameData gameData, String authToken) throws DataAccessException {
+        try {
+            String username = AUTHDAO.getAuth(authToken).username();
+            if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException("Unauthorized", 500);
         }
     }
 
