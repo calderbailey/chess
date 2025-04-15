@@ -54,9 +54,7 @@ public class GamePlayRepl implements NotificationHandler {
         TYPE_MAP.put('q', PieceType.QUEEN);
     }
 
-    public void setWS(WebSocketFacade ws) {
-        this.ws = ws;
-    }
+    public void setWS(WebSocketFacade ws) {this.ws = ws;}
 
     public void initiate() throws DataAccessException {
         if (playerStatus.equals("Playing")) {
