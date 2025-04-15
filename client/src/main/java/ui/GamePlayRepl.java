@@ -157,6 +157,9 @@ public class GamePlayRepl implements NotificationHandler {
             if (startPosition.equals(endPosition)) {
                 throw new DataAccessException("ERROR: invalid move", 500);
             }
+            if (gameData.game().getBoard().getPiece(startPosition) == null) {
+                throw new DataAccessException("ERROR: invalid move", 500);
+            }
             PieceType promoPiece = checkPromotion(startPosition, endPosition);
             ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
             ws.makeMove(move);
