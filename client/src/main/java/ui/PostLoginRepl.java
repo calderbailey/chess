@@ -41,7 +41,6 @@ public class PostLoginRepl {
         System.exit(1);
     }
 
-
     private void eval(String[] userInput) throws DataAccessException {
         switch (userInput[0].toLowerCase()) {
             case "create":
