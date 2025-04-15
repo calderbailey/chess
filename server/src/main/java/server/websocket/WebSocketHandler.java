@@ -161,7 +161,8 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, InvalidMoveException, IOException {
+    private void makeMove(int gameID, String authToken, ChessMove move, Session session)
+            throws DataAccessException, InvalidMoveException, IOException {
         GameData gameData = GAMEDAO.getGame(gameID);
         if (gameData.game().isGameComplete()) {
             ErrorMessage errorMessage = new ErrorMessage("Game Completed");

@@ -1,5 +1,4 @@
 package ui;
-
 import chess.ChessBoard;
 import chess.ChessGame.*;
 import chess.ChessMove;
@@ -10,15 +9,9 @@ import exceptionhandling.DataAccessException;
 import model.GameData;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
-
+import websocket.messages.*;
 import java.util.*;
-
-import static chess.ChessGame.TeamColor.BLACK;
-import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessGame.TeamColor.*;
 import static ui.EscapeSequences.*;
 
 public class GamePlayRepl implements NotificationHandler {
@@ -34,7 +27,6 @@ public class GamePlayRepl implements NotificationHandler {
     private final ChessClient client;
     private String teamColor;
     private WebSocketFacade ws;
-
 
     public GamePlayRepl(String serverUrl, String[] userInput, String playerStatus, WebSocketFacade ws) {
         this.serverUrl = serverUrl;
@@ -52,18 +44,9 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     static {
-        COLUMN_MAP = new HashMap<>();
-        COLUMN_MAP.put('a', 1);
-        COLUMN_MAP.put('b', 2);
-        COLUMN_MAP.put('c', 3);
-        COLUMN_MAP.put('d', 4);
-        COLUMN_MAP.put('e', 5);
-        COLUMN_MAP.put('f', 6);
-        COLUMN_MAP.put('g', 7);
-        COLUMN_MAP.put('h', 8);
-    }
-
-    static {
+        COLUMN_MAP = Map.of(
+                'a', 1, 'b', 2, 'c', 3, 'd', 4,
+                'e', 5, 'f', 6, 'g', 7, 'h', 8);
         TYPE_MAP = new HashMap<>();
         TYPE_MAP.put('r', PieceType.ROOK);
         TYPE_MAP.put('n', PieceType.KNIGHT);
@@ -156,10 +139,10 @@ public class GamePlayRepl implements NotificationHandler {
     private void leave() throws DataAccessException {
         try {
             ws.leave();
+            proceed = false;
         } catch (Exception ex) {
             System.out.printf(ex.getMessage());
         }
-        proceed = false;
     }
 
     private void makeMove(String[] userInput) throws DataAccessException {
@@ -233,21 +216,11 @@ public class GamePlayRepl implements NotificationHandler {
     private void redraw() {
         printBoard(null);
         if (gameData.game().isGameComplete()) {
-            System.out.printf(SET_TEXT_COLOR_RED +
-                    ">>>  " +
-                    "Game Complete" +
-                    "  <<<" +
-                    RESET_TEXT_COLOR +
-                    "\n\n");
+            System.out.printf(SET_TEXT_COLOR_RED + ">>>  " + "Game Complete" + "  <<<" + RESET_TEXT_COLOR + "\n\n");
         } else {
-            System.out.printf(SET_TEXT_COLOR_RED +
-                    ">>>  " +
-                    "It's the " +
-                    gameData.game().getTeamTurn().toString().toLowerCase() +
-                    " team's turn" +
-                    "  <<<" +
-                    RESET_TEXT_COLOR +
-                    "\n\n");
+            System.out.printf(SET_TEXT_COLOR_RED + ">>>  " + "It's the " +
+                    gameData.game().getTeamTurn().toString().toLowerCase() + " team's turn" + "  <<<" +
+                    RESET_TEXT_COLOR + "\n\n");
         }
     }
 
@@ -449,7 +422,7 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     private String squareColorSwap(String squareColor) {
-        if (squareColor == "WHITE") {
+        if (squareColor.equals("WHITE")) {
             return "BLACK";
         } else {
             return "WHITE";
@@ -473,16 +446,11 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     private String highlightedSquare(char piece, String squareColor) {
-        switch (squareColor) {
-            case "WHITE" -> {
-                return SET_BG_COLOR_LIGHT_BLUE + spaceBuilder(piece);
-            }
-            case "BLACK" -> {
-                return SET_BG_COLOR_BLUE + spaceBuilder(piece);
-            }
-
+        if (squareColor.equals("WHITE")) {
+            return SET_BG_COLOR_LIGHT_BLUE + spaceBuilder(piece);
+        } else {
+            return SET_BG_COLOR_BLUE + spaceBuilder(piece);
         }
-        return SET_BG_COLOR_BLUE + spaceBuilder(piece);
     }
 
     private String initialSquare(char piece, String squareColor) {
@@ -494,17 +462,12 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
     private String help() {
-        return (SET_TEXT_COLOR_BLUE + "redraw " +
-                SET_TEXT_COLOR_MAGENTA + "- chess board\n" +
-                SET_TEXT_COLOR_BLUE + "leave " +
-                SET_TEXT_COLOR_MAGENTA + "- game\n" +
+        return (SET_TEXT_COLOR_BLUE + "redraw " + SET_TEXT_COLOR_MAGENTA + "- chess board\n" +
+                SET_TEXT_COLOR_BLUE + "leave " + SET_TEXT_COLOR_MAGENTA + "- game\n" +
                 SET_TEXT_COLOR_BLUE + "makeMove <StartRow> <StartColumn> <EndRow> <EndColumn> \n" +
-                SET_TEXT_COLOR_BLUE + "resign " +
-                SET_TEXT_COLOR_MAGENTA + "- from game\n" +
-                SET_TEXT_COLOR_BLUE + "highlight <Row> <Col> " +
-                SET_TEXT_COLOR_MAGENTA + "- legal moves\n" +
-                SET_TEXT_COLOR_BLUE + "help " +
-                SET_TEXT_COLOR_MAGENTA + "- with possible commands\n" +
+                SET_TEXT_COLOR_BLUE + "resign " + SET_TEXT_COLOR_MAGENTA + "- from game\n" +
+                SET_TEXT_COLOR_BLUE + "highlight <Row> <Col> " + SET_TEXT_COLOR_MAGENTA + "- legal moves\n" +
+                SET_TEXT_COLOR_BLUE + "help " + SET_TEXT_COLOR_MAGENTA + "- with possible commands\n" +
                 RESET_TEXT_COLOR);
     }
 
